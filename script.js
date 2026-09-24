@@ -37,7 +37,9 @@ const instagramImages = [
 let cartCount = 0;
 
 
-/* PRODUCTS */
+/* =========================
+   PRODUCTS
+========================= */
 
 const productRoot = document.querySelector('#products');
 
@@ -49,6 +51,7 @@ products.forEach((product) => {
 
   card.innerHTML = `
     <div class="product-image">
+
       <img
         src="${product.image}"
         alt="${product.name}"
@@ -67,6 +70,7 @@ products.forEach((product) => {
       >
         ♧
       </button>
+
     </div>
 
     <div class="product-info">
@@ -104,7 +108,9 @@ products.forEach((product) => {
 });
 
 
-/* INSTAGRAM */
+/* =========================
+   INSTAGRAM
+========================= */
 
 const instaRoot = document.querySelector('#instagram-grid');
 
@@ -129,7 +135,9 @@ instagramImages.forEach((src, index) => {
 });
 
 
-/* MOBILE MENU */
+/* =========================
+   MOBILE MENU
+========================= */
 
 const drawer = document.querySelector('#mobile-drawer');
 const backdrop = document.querySelector('#drawer-backdrop');
@@ -173,19 +181,148 @@ drawer
   });
 
 
-/* CUSTOM ORDER FORM */
+/* =========================
+   CUSTOM ORDER + PHOTO
+========================= */
 
 const customForm = document.querySelector('#custom-form');
 const successMessage = document.querySelector('#form-success');
 
-customForm.addEventListener('submit', function () {
+const photoInput = document.querySelector('#photo');
+const photoData = document.querySelector('#photoData');
+const photoName = document.querySelector('#photoName');
+const photoMimeType = document.querySelector('#photoMimeType');
 
-  setTimeout(function () {
 
-    successMessage.hidden = false;
+customForm.addEventListener('submit', function (event) {
 
-    customForm.reset();
+  event.preventDefault();
 
-  }, 1000);
+  const file = photoInput.files[0];
+
+  /*
+    If no photo is selected,
+    submit the order normally.
+  */
+
+  if (!file) {
+
+    customForm.submit();
+
+    setTimeout(() => {
+
+      successMessage.hidden = false;
+      customForm.reset();
+
+    }, 1500);
+
+    return;
+  }
+
+
+  /*
+    Compress the image before sending.
+    This keeps the form small and faster.
+  */
+
+  const reader = new FileReader();
+
+  reader.onload = function () {
+
+    const img = new Image();
+
+    img.onload = function () {
+
+      const canvas = document.createElement('canvas');
+
+      const maxWidth = 1200;
+      const maxHeight = 1200;
+
+      let width = img.width;
+      let height = img.height;
+
+
+      if (width > maxWidth) {
+
+        height = height * (maxWidth / width);
+        width = maxWidth;
+
+      }
+
+
+      if (height > maxHeight) {
+
+        width = width * (maxHeight / height);
+        height = maxHeight;
+
+      }
+
+
+      canvas.width = width;
+      canvas.height = height;
+
+
+      const ctx = canvas.getContext('2d');
+
+      ctx.drawImage(
+        img,
+        0,
+        0,
+        width,
+        height
+      );
+
+
+      /*
+        Convert image to JPEG Base64.
+      */
+
+      const compressedData = canvas.toDataURL(
+        'image/jpeg',
+        0.75
+      );
+
+
+      /*
+        Put photo information into hidden inputs.
+      */
+
+      photoData.value = compressedData;
+
+      photoName.value =
+        file.name.replace(/\.[^/.]+$/, '') +
+        '.jpg';
+
+      photoMimeType.value = 'image/jpeg';
+
+
+      /*
+        Submit to hidden iframe.
+      */
+
+      customForm.submit();
+
+
+      /*
+        Show success message on website.
+      */
+
+      setTimeout(() => {
+
+        successMessage.hidden = false;
+
+        customForm.reset();
+
+      }, 1500);
+
+    };
+
+
+    img.src = reader.result;
+
+  };
+
+
+  reader.readAsDataURL(file);
 
 });
