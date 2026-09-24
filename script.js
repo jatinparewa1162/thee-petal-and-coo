@@ -1,31 +1,133 @@
-const customForm = document.querySelector('#custom-form');
-const successMessage = document.querySelector('#form-success');
+const products=[
+ {name:'The Pink Promise',price:'₹899',tag:'best seller',image:'https://images.unsplash.com/photo-1523438885200-e635ba2c371e?auto=format&fit=crop&w=900&q=85'},
+ {name:'Strawberry Fields',price:'₹699',tag:'new in',image:'https://images.unsplash.com/photo-1490750967868-88aa4486c946?auto=format&fit=crop&w=900&q=85'},
+ {name:'Sunshine, Always',price:'₹799',tag:'',image:'https://images.unsplash.com/photo-1527061011665-3652c757a4d4?auto=format&fit=crop&w=900&q=85'},
+ {name:'A Little Something',price:'₹499',tag:'',image:'https://images.unsplash.com/photo-1455582916367-25f75bfc6710?auto=format&fit=crop&w=900&q=85'}
+];
 
-customForm.addEventListener('submit', function(event) {
+const instagramImages=[
+ 'https://images.unsplash.com/photo-1490750967868-88aa4486c946?auto=format&fit=crop&w=500&q=80',
+ 'https://images.unsplash.com/photo-1523438885200-e635ba2c371e?auto=format&fit=crop&w=500&q=80',
+ 'https://images.unsplash.com/photo-1527061011665-3652c757a4d4?auto=format&fit=crop&w=500&q=80',
+ 'https://images.unsplash.com/photo-1455582916367-25f75bfc6710?auto=format&fit=crop&w=500&q=80',
+ 'https://images.unsplash.com/photo-1526047932273-341f2a7631f9?auto=format&fit=crop&w=500&q=80',
+ 'https://images.unsplash.com/photo-1468327768560-75b778cbb551?auto=format&fit=crop&w=500&q=80'
+];
+
+let cartCount=0;
+
+const productRoot=document.querySelector('#products');
+
+products.forEach((product)=>{
+  const card=document.createElement('article');
+
+  card.className='product-card';
+
+  card.innerHTML=`
+    <div class="product-image">
+      <img src="${product.image}" alt="${product.name}" loading="lazy">
+      ${product.tag?`<span class="tag">${product.tag}</span>`:''}
+      <button class="add-button" aria-label="Add ${product.name} to bag">♧</button>
+    </div>
+    <div class="product-info">
+      <div>
+        <h3>${product.name}</h3>
+        <p>${product.price}</p>
+      </div>
+      <button class="heart" aria-label="Save ${product.name}">♡</button>
+    </div>
+  `;
+
+  card.querySelector('.add-button').addEventListener('click',()=>{
+    cartCount+=1;
+
+    const badge=document.querySelector('#cart-count');
+
+    badge.hidden=false;
+    badge.textContent=cartCount;
+  });
+
+  productRoot.appendChild(card);
+});
+
+
+const instaRoot=document.querySelector('#instagram-grid');
+
+instagramImages.forEach((src,index)=>{
+  const link=document.createElement('a');
+
+  link.href='https://instagram.com/thhepetalandco';
+  link.target='_blank';
+  link.rel='noreferrer';
+
+  link.innerHTML=`
+    <img src="${src}" alt="Instagram post ${index+1}" loading="lazy">
+  `;
+
+  instaRoot.appendChild(link);
+});
+
+
+const drawer=document.querySelector('#mobile-drawer');
+const backdrop=document.querySelector('#drawer-backdrop');
+
+function toggleMenu(open){
+  drawer.classList.toggle('open',open);
+  backdrop.classList.toggle('open',open);
+  drawer.setAttribute('aria-hidden',String(!open));
+}
+
+document.querySelector('#menu-open').addEventListener('click',()=>{
+  toggleMenu(true);
+});
+
+document.querySelector('#menu-close').addEventListener('click',()=>{
+  toggleMenu(false);
+});
+
+backdrop.addEventListener('click',()=>{
+  toggleMenu(false);
+});
+
+drawer.querySelectorAll('a').forEach((link)=>{
+  link.addEventListener('click',()=>{
+    toggleMenu(false);
+  });
+});
+
+
+/* CUSTOM ORDER FORM */
+
+const customForm=document.querySelector('#custom-form');
+const successMessage=document.querySelector('#form-success');
+
+customForm.addEventListener('submit',function(event){
+
   event.preventDefault();
 
-  const formData = new FormData(customForm);
+  const formData=new FormData(customForm);
 
-  const submitData = new URLSearchParams();
+  const submitData=new URLSearchParams();
 
-  submitData.append('name', formData.get('name') || '');
-  submitData.append('whatsapp', formData.get('whatsapp') || '');
-  submitData.append('occasion', formData.get('occasion') || '');
-  submitData.append('budget', formData.get('budget') || '');
-  submitData.append('colours', formData.get('colours') || '');
-  submitData.append('product', formData.get('product') || '');
-  submitData.append('message', formData.get('message') || '');
+  submitData.append('name',formData.get('name') || '');
+  submitData.append('whatsapp',formData.get('whatsapp') || '');
+  submitData.append('occasion',formData.get('occasion') || '');
+  submitData.append('budget',formData.get('budget') || '');
+  submitData.append('colours',formData.get('colours') || '');
+  submitData.append('product',formData.get('product') || '');
+  submitData.append('message',formData.get('message') || '');
 
-  fetch('https://script.google.com/macros/s/AKfycbwiGE4hTomAmuLKBkcWrBIxkSrXA91c80O09oahNABFZpQYgQApSgpXk7b2-28GDaDP/exec', {
-    method: 'POST',
-    mode: 'no-cors',
-    body: submitData
+  fetch('https://script.google.com/macros/s/AKfycbwiGE4hTomAmuLKBkcWrBIxkSrXA91c80O09oahNABFZpQYgQApSgpXk7b2-28GDaDP/exec',{
+    method:'POST',
+    mode:'no-cors',
+    body:submitData
   })
-  .then(() => {
-    successMessage.hidden = false;
+  .then(()=>{
+    successMessage.hidden=false;
     customForm.reset();
   })
-  .catch(() => {
+  .catch(()=>{
     alert('Something went wrong. Please try again.');
   });
+
 });
