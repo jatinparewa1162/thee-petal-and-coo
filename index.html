@@ -43,12 +43,11 @@
         </div>
 
         <form
-          class="custom-form"
-          id="custom-form"
-          action="https://script.google.com/macros/s/AKfycbwiGE4hTomAmuLKBkcWrBIxkSrXA91c80O09oahNABFZpQYgQApSgpXk7b2-28GDaDP/exec"
-          method="POST"
-          target="hidden-form"
-        >
+  class="custom-form"
+  id="custom-form"
+  action="https://script.google.com/macros/s/AKfycbwiGE4hTomAmuLKBkcWrBIxkSrXA91c80O09oahNABFZpQYgQApSgpXk7b2-28GDaDP/exec"
+  method="POST"
+>
 
           <label>
             Name
@@ -116,9 +115,6 @@
       </div>
     </section>
 
-    <!-- Hidden form target -->
-    <iframe name="hidden-form" style="display:none;"></iframe>
-
     <section class="reviews page-width"><div class="section-heading"><div><p class="eyebrow">notes from our love club</p><h2>What our customers say ♡</h2></div><a href="https://instagram.com/thhepetalandco" target="_blank" rel="noreferrer">View Instagram reviews</a></div><div class="review-grid"><article><div class="stars">★★★★★</div><p>“The prettiest surprise — it felt so personal and the packaging was adorable!”</p><small>Riya S. · The Pink Promise</small></article><article><div class="stars">★★★★★</div><p>“I sent a vague idea and they made it even better. Every tiny detail was perfect.”</p><small>Mehak A. · Custom bouquet</small></article><article><div class="stars">★★★★★</div><p>“My best friend is still talking about this bouquet. So colourful, so us.”</p><small>Ananya K. · Strawberry Fields</small></article></div></section>
 
     <section class="instagram"><div class="page-width center"><p class="eyebrow">@thhepetalandco</p><h2>Made With Love, Shared With You ♡</h2><div class="instagram-grid" id="instagram-grid"></div><a class="button primary" href="https://instagram.com/thhepetalandco" target="_blank" rel="noreferrer">Follow us on Instagram <span>→</span></a></div></section>
@@ -128,14 +124,6 @@
 
   <script src="script.js"></script>
 
-  <!-- Form success message only -->
-  <script>
-    document.getElementById("custom-form").addEventListener("submit", function () {
-      setTimeout(function () {
-        document.getElementById("form-success").hidden = false;
-      }, 1000);
-    });
-  </script>
 
 </body>
 </html>
