@@ -20,7 +20,6 @@ const productRoot=document.querySelector('#products');
 
 products.forEach((product)=>{
   const card=document.createElement('article');
-
   card.className='product-card';
 
   card.innerHTML=`
@@ -29,22 +28,18 @@ products.forEach((product)=>{
       ${product.tag?`<span class="tag">${product.tag}</span>`:''}
       <button class="add-button" aria-label="Add ${product.name} to bag">♧</button>
     </div>
-
     <div class="product-info">
       <div>
         <h3>${product.name}</h3>
         <p>${product.price}</p>
       </div>
-
       <button class="heart" aria-label="Save ${product.name}">♡</button>
     </div>
   `;
 
   card.querySelector('.add-button').addEventListener('click',()=>{
     cartCount+=1;
-
     const badge=document.querySelector('#cart-count');
-
     badge.hidden=false;
     badge.textContent=cartCount;
   });
@@ -52,23 +47,16 @@ products.forEach((product)=>{
   productRoot.appendChild(card);
 });
 
-
 const instaRoot=document.querySelector('#instagram-grid');
 
 instagramImages.forEach((src,index)=>{
   const link=document.createElement('a');
-
   link.href='https://instagram.com/thhepetalandco';
   link.target='_blank';
   link.rel='noreferrer';
-
-  link.innerHTML=`
-    <img src="${src}" alt="Instagram post ${index+1}" loading="lazy">
-  `;
-
+  link.innerHTML=`<img src="${src}" alt="Instagram post ${index+1}" loading="lazy">`;
   instaRoot.appendChild(link);
 });
-
 
 const drawer=document.querySelector('#mobile-drawer');
 const backdrop=document.querySelector('#drawer-backdrop');
@@ -79,27 +67,15 @@ function toggleMenu(open){
   drawer.setAttribute('aria-hidden',String(!open));
 }
 
-document.querySelector('#menu-open').addEventListener('click',()=>{
-  toggleMenu(true);
-});
-
-document.querySelector('#menu-close').addEventListener('click',()=>{
-  toggleMenu(false);
-});
-
-backdrop.addEventListener('click',()=>{
-  toggleMenu(false);
-});
+document.querySelector('#menu-open').addEventListener('click',()=>toggleMenu(true));
+document.querySelector('#menu-close').addEventListener('click',()=>toggleMenu(false));
+backdrop.addEventListener('click',()=>toggleMenu(false));
 
 drawer.querySelectorAll('a').forEach((link)=>{
-  link.addEventListener('click',()=>{
-    toggleMenu(false);
-  });
+  link.addEventListener('click',()=>toggleMenu(false));
 });
 
 
 /* CUSTOM ORDER FORM */
 
-document.querySelector('#custom-form').addEventListener('submit',(event)=>{
-  document.querySelector('#form-success').hidden=false;
-});
+const
