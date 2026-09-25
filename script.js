@@ -1,3 +1,5 @@
+const PRODUCTS_API_URL = "https://script.google.com/macros/s/AKfycbwOkwuQQDuGm8Ndx08pKKkklXkJCr4agUtUJ1JfQYkc0YtSynFsAinYmj_GiSab0SuY/exec";
+
 const products = [
   {
     name:'The Pink Promise',
