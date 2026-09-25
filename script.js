@@ -1,5 +1,6 @@
 const PRODUCTS_API_URL = "https://script.google.com/macros/s/AKfycbwOkwuQQDuGm8Ndx08pKKkklXkJCr4agUtUJ1JfQYkc0YtSynFsAinYmj_GiSab0SuY/exec";
 
+
 /* =========================
    FALLBACK PRODUCTS
 ========================= */
@@ -68,8 +69,59 @@ const instagramImages = [
 
 let cart = [];
 
+try {
+
+  const savedCart =
+    localStorage.getItem('petalCart');
+
+  if(savedCart){
+
+    const parsedCart =
+      JSON.parse(savedCart);
+
+    if(Array.isArray(parsedCart)){
+      cart = parsedCart;
+    }
+
+  }
+
+}catch(error){
+
+  console.error(
+    'Could not load saved cart:',
+    error
+  );
+
+}
+
+
+function saveCart(){
+
+  try{
+
+    localStorage.setItem(
+      'petalCart',
+      JSON.stringify(cart)
+    );
+
+  }catch(error){
+
+    console.error(
+      'Could not save cart:',
+      error
+    );
+
+  }
+
+}
+
+
 function formatPrice(amount){
-  return '₹' + Number(amount || 0).toLocaleString('en-IN');
+
+  return '₹' +
+    Number(amount || 0)
+      .toLocaleString('en-IN');
+
 }
 
 
@@ -77,18 +129,34 @@ function formatPrice(amount){
    DOM ELEMENTS
 ========================= */
 
-const bagButton = document.querySelector('#bag-button');
-const cartCount = document.querySelector('#cart-count');
-const cartDrawer = document.querySelector('#cart-drawer');
-const cartBackdrop = document.querySelector('#cart-backdrop');
-const cartItems = document.querySelector('#cart-items');
-const cartEmpty = document.querySelector('#cart-empty');
-const cartTotal = document.querySelector('#cart-total');
-const cartClose = document.querySelector('#cart-close');
+const bagButton =
+  document.querySelector('#bag-button');
 
-const customiseOrder = document.querySelector(
-  '#customise-order,#customize-order,#checkout-button,.customise-order'
-);
+const cartCount =
+  document.querySelector('#cart-count');
+
+const cartDrawer =
+  document.querySelector('#cart-drawer');
+
+const cartBackdrop =
+  document.querySelector('#cart-backdrop');
+
+const cartItems =
+  document.querySelector('#cart-items');
+
+const cartEmpty =
+  document.querySelector('#cart-empty');
+
+const cartTotal =
+  document.querySelector('#cart-total');
+
+const cartClose =
+  document.querySelector('#cart-close');
+
+const customiseOrder =
+  document.querySelector(
+    '#customise-order,#customize-order,#checkout-button,.customise-order'
+  );
 
 
 /* =========================
@@ -99,13 +167,19 @@ function updateCartCount(){
 
   if(!cartCount) return;
 
-  const count = cart.reduce(
-    (total,item) => total + item.quantity,
-    0
-  );
+  const count =
+    cart.reduce(
+      (total,item) =>
+        total + Number(item.quantity || 0),
+      0
+    );
 
-  cartCount.textContent = count;
-  cartCount.hidden = count === 0;
+  cartCount.textContent =
+    count;
+
+  cartCount.hidden =
+    count === 0;
+
 }
 
 
@@ -115,9 +189,13 @@ function updateCartCount(){
 
 function addToCart(product){
 
-  const existing = cart.find(
-    item => item.name === product.name
-  );
+  const existing =
+    cart.find(
+      item =>
+        item.id === product.id ||
+        item.name === product.name
+    );
+
 
   if(existing){
 
@@ -132,9 +210,13 @@ function addToCart(product){
 
   }
 
+
+  saveCart();
+
   updateCartCount();
   renderCart();
   openCart();
+
 }
 
 
@@ -144,12 +226,18 @@ function addToCart(product){
 
 function removeFromCart(name){
 
-  cart = cart.filter(
-    item => item.name !== name
-  );
+  cart =
+    cart.filter(
+      item =>
+        item.name !== name
+    );
+
+
+  saveCart();
 
   updateCartCount();
   renderCart();
+
 }
 
 
@@ -157,15 +245,23 @@ function removeFromCart(name){
    QUANTITY
 ========================= */
 
-function changeQuantity(name,change){
+function changeQuantity(
+  name,
+  change
+){
 
-  const item = cart.find(
-    product => product.name === name
-  );
+  const item =
+    cart.find(
+      product =>
+        product.name === name
+    );
+
 
   if(!item) return;
 
+
   item.quantity += change;
+
 
   if(item.quantity <= 0){
 
@@ -174,8 +270,12 @@ function changeQuantity(name,change){
 
   }
 
+
+  saveCart();
+
   updateCartCount();
   renderCart();
+
 }
 
 
@@ -187,12 +287,13 @@ function getCartTotal(){
 
   return cart.reduce(
     (total,item) =>
-      total + item.priceNumber * item.quantity,
+      total +
+      Number(item.priceNumber || 0) *
+      Number(item.quantity || 0),
     0
   );
 
 }
-
 
 /* =========================
    RENDER CART
@@ -203,6 +304,7 @@ function renderCart(){
   if(!cartItems) return;
 
   cartItems.innerHTML = '';
+
 
   if(cart.length === 0){
 
@@ -218,11 +320,15 @@ function renderCart(){
 
   cart.forEach(item => {
 
-    const el = document.createElement('div');
+    const el =
+      document.createElement('div');
 
-    el.className = 'cart-item';
+    el.className =
+      'cart-item';
+
 
     el.innerHTML = `
+
       <img
         src="${item.image}"
         alt="${item.name}"
@@ -231,9 +337,13 @@ function renderCart(){
 
       <div class="cart-item-info">
 
-        <h3>${item.name}</h3>
+        <h3>
+          ${item.name}
+        </h3>
 
-        <p>${formatPrice(item.priceNumber)}</p>
+        <p>
+          ${formatPrice(item.priceNumber)}
+        </p>
 
         <div class="cart-item-bottom">
 
@@ -242,14 +352,20 @@ function renderCart(){
             <button
               type="button"
               class="qty-minus"
-            >−</button>
+            >
+              −
+            </button>
 
-            <span>${item.quantity}</span>
+            <span>
+              ${item.quantity}
+            </span>
 
             <button
               type="button"
               class="qty-plus"
-            >+</button>
+            >
+              +
+            </button>
 
           </div>
 
@@ -266,25 +382,39 @@ function renderCart(){
     `;
 
 
-    el.querySelector('.qty-minus')
-      .addEventListener(
-        'click',
-        () => changeQuantity(item.name,-1)
-      );
+    el.querySelector(
+      '.qty-minus'
+    ).addEventListener(
+      'click',
+      () =>
+        changeQuantity(
+          item.name,
+          -1
+        )
+    );
 
 
-    el.querySelector('.qty-plus')
-      .addEventListener(
-        'click',
-        () => changeQuantity(item.name,1)
-      );
+    el.querySelector(
+      '.qty-plus'
+    ).addEventListener(
+      'click',
+      () =>
+        changeQuantity(
+          item.name,
+          1
+        )
+    );
 
 
-    el.querySelector('.cart-remove')
-      .addEventListener(
-        'click',
-        () => removeFromCart(item.name)
-      );
+    el.querySelector(
+      '.cart-remove'
+    ).addEventListener(
+      'click',
+      () =>
+        removeFromCart(
+          item.name
+        )
+    );
 
 
     cartItems.appendChild(el);
@@ -292,9 +422,14 @@ function renderCart(){
   });
 
 
-  if(cartTotal)
+  if(cartTotal){
+
     cartTotal.textContent =
-      formatPrice(getCartTotal());
+      formatPrice(
+        getCartTotal()
+      );
+
+  }
 
 }
 
@@ -306,12 +441,21 @@ function renderCart(){
 function openCart(){
 
   if(cartDrawer)
-    cartDrawer.classList.add('open');
+    cartDrawer.classList.add(
+      'open'
+    );
+
 
   if(cartBackdrop)
-    cartBackdrop.classList.add('open');
+    cartBackdrop.classList.add(
+      'open'
+    );
 
-  document.body.classList.add('cart-open');
+
+  document.body.classList.add(
+    'cart-open'
+  );
+
 }
 
 
@@ -322,12 +466,21 @@ function openCart(){
 function closeCart(){
 
   if(cartDrawer)
-    cartDrawer.classList.remove('open');
+    cartDrawer.classList.remove(
+      'open'
+    );
+
 
   if(cartBackdrop)
-    cartBackdrop.classList.remove('open');
+    cartBackdrop.classList.remove(
+      'open'
+    );
 
-  document.body.classList.remove('cart-open');
+
+  document.body.classList.remove(
+    'cart-open'
+  );
+
 }
 
 
@@ -342,6 +495,7 @@ if(bagButton){
     () => {
 
       renderCart();
+
       openCart();
 
     }
@@ -369,6 +523,73 @@ if(cartBackdrop){
 
 }
 
+
+/* =========================
+   CUSTOM ORDER HELPERS
+========================= */
+
+function getCartProductText(){
+
+  return cart
+    .map(
+      item =>
+        `${item.name} × ${item.quantity}`
+    )
+    .join(', ');
+
+}
+
+
+function getCartCategoryText(){
+
+  const categories =
+    cart
+      .map(
+        item =>
+          String(
+            item.category || ''
+          ).trim()
+      )
+      .filter(Boolean);
+
+
+  const uniqueCategories =
+    [...new Set(categories)];
+
+
+  return uniqueCategories.join(
+    ' + '
+  );
+
+}
+
+
+function getCartDetailsText(){
+
+  return cart
+    .map(item => {
+
+      const category =
+        item.category
+          ? ` — ${item.category}`
+          : '';
+
+      const price =
+        formatPrice(
+          item.priceNumber
+        );
+
+      return (
+        `${item.name}${category} × ${item.quantity} ` +
+        `(${price} each)`
+      );
+
+    })
+    .join('\n');
+
+}
+
+
 /* =========================
    CUSTOMISE / ORDER
 ========================= */
@@ -384,7 +605,10 @@ if(customiseOrder){
         closeCart();
 
         const section =
-          document.querySelector('#custom');
+          document.querySelector(
+            '#custom'
+          );
+
 
         if(section){
 
@@ -395,79 +619,140 @@ if(customiseOrder){
         }
 
         return;
+
       }
 
 
       const selectedProducts =
-        cart
-          .map(
-            item =>
-              `${item.name} × ${item.quantity}`
-          )
-          .join(', ');
+        getCartProductText();
+
+
+      const categoryText =
+        getCartCategoryText();
+
+
+      const total =
+        getCartTotal();
 
 
       const totalText =
-        formatPrice(getCartTotal());
+        formatPrice(total);
 
+
+      const details =
+        getCartDetailsText();
+
+
+      /* =====================
+         PRODUCT FIELD
+      ===================== */
 
       const productField =
-        document.querySelector('#product');
+        document.querySelector(
+          '#product'
+        );
 
-      const budgetField =
-        document.querySelector('#budget');
-
-      const messageField =
-        document.querySelector('#message');
-
-
-      /* PRODUCT */
 
       if(productField){
 
-        if(productField.tagName === 'SELECT'){
+        if(
+          productField.tagName ===
+          'SELECT'
+        ){
+
+          /*
+           * Remove previous
+           * cart-created option.
+           */
 
           const old =
             productField.querySelector(
               'option[data-cart-order="true"]'
             );
 
+
           if(old)
             old.remove();
 
 
-          const option =
-            document.createElement('option');
+          /*
+           * If there is one
+           * category, select the
+           * real category option.
+           */
 
-          option.value =
-            selectedProducts;
+          const matchingOption =
+            [...productField.options]
+              .find(
+                option =>
+                  option.value
+                    .toLowerCase() ===
+                  categoryText
+                    .toLowerCase()
+              );
 
-          option.textContent =
-            selectedProducts;
 
-          option.selected = true;
+          if(
+            matchingOption &&
+            !categoryText.includes('+')
+          ){
 
-          option.dataset.cartOrder =
-            'true';
+            productField.value =
+              matchingOption.value;
+
+          }else{
+
+            /*
+             * Multiple categories:
+             * create temporary option.
+             */
+
+            const option =
+              document.createElement(
+                'option'
+              );
 
 
-          productField.insertBefore(
-            option,
-            productField.firstChild
-          );
+            option.value =
+              categoryText ||
+              selectedProducts;
+
+
+            option.textContent =
+              categoryText
+                ? `Cart: ${categoryText}`
+                : selectedProducts;
+
+
+            option.selected =
+              true;
+
+
+            option.dataset.cartOrder =
+              'true';
+
+
+            productField.insertBefore(
+              option,
+              productField.firstChild
+            );
+
+          }
 
 
           productField.dispatchEvent(
             new Event(
               'change',
-              { bubbles:true }
+              {
+                bubbles:true
+              }
             )
           );
-
 
         }else{
 
           productField.value =
+            categoryText ||
             selectedProducts;
 
         }
@@ -475,31 +760,50 @@ if(customiseOrder){
       }
 
 
-      /* BUDGET */
+      /* =====================
+         BUDGET FIELD
+      ===================== */
+
+      const budgetField =
+        document.querySelector(
+          '#budget'
+        );
+
 
       if(budgetField){
 
-        if(budgetField.tagName === 'SELECT'){
+        if(
+          budgetField.tagName ===
+          'SELECT'
+        ){
 
           const old =
             budgetField.querySelector(
               'option[data-cart-budget="true"]'
             );
 
+
           if(old)
             old.remove();
 
 
           const option =
-            document.createElement('option');
+            document.createElement(
+              'option'
+            );
+
 
           option.value =
             totalText;
 
-          option.textContent =
-            `Selected Products Total: ${totalText}`;
 
-          option.selected = true;
+          option.textContent =
+            `Cart Total: ${totalText}`;
+
+
+          option.selected =
+            true;
+
 
           option.dataset.cartBudget =
             'true';
@@ -514,10 +818,11 @@ if(customiseOrder){
           budgetField.dispatchEvent(
             new Event(
               'change',
-              { bubbles:true }
+              {
+                bubbles:true
+              }
             )
           );
-
 
         }else{
 
@@ -529,30 +834,96 @@ if(customiseOrder){
       }
 
 
-      /* MESSAGE */
+      /* =====================
+         MESSAGE FIELD
+      ===================== */
+
+      const messageField =
+        document.querySelector(
+          '#message'
+        );
+
 
       if(messageField){
 
         const orderText =
-          `Selected Products: ${selectedProducts}\nEstimated Total: ${totalText}`;
+`Selected Cart Items:
+${details}
+
+Categories:
+${categoryText || 'Custom'}
+
+Total:
+${totalText}`;
 
 
         const existing =
           messageField.value.trim();
 
 
-        if(
-          !existing.includes(
-            'Selected Products:'
-          )
-        ){
+        /*
+         * Remove old automatically
+         * generated cart details.
+         */
 
-          messageField.value =
-            existing
-              ? `${existing}\n\n${orderText}`
-              : orderText;
+        const marker =
+          'Selected Cart Items:';
+
+
+        let cleanExisting =
+          existing;
+
+
+        const oldIndex =
+          cleanExisting.indexOf(
+            marker
+          );
+
+
+        if(oldIndex !== -1){
+
+          cleanExisting =
+            cleanExisting
+              .substring(
+                0,
+                oldIndex
+              )
+              .trim();
 
         }
+
+
+        messageField.value =
+          cleanExisting
+            ? `${cleanExisting}\n\n${orderText}`
+            : orderText;
+
+      }
+
+
+      /*
+       * Save order data too.
+       * This is useful if the page
+       * reloads before submitting.
+       */
+
+      try{
+
+        sessionStorage.setItem(
+          'petalCartOrder',
+          JSON.stringify({
+            products: cart,
+            categories: categoryText,
+            total: total
+          })
+        );
+
+      }catch(error){
+
+        console.error(
+          'Could not save order data:',
+          error
+        );
 
       }
 
@@ -561,7 +932,9 @@ if(customiseOrder){
 
 
       const section =
-        document.querySelector('#custom');
+        document.querySelector(
+          '#custom'
+        );
 
 
       if(section){
@@ -588,25 +961,29 @@ if(customiseOrder){
 
 }
 
-
 /* =========================
    PRODUCT CARDS
 ========================= */
 
 const productsContainer =
-  document.querySelector('#products');
+  document.querySelector(
+    '#products'
+  );
 
 
 function createProductCard(product){
 
   const card =
-    document.createElement('article');
+    document.createElement(
+      'article'
+    );
 
   card.className =
     'product-card';
 
 
   card.innerHTML = `
+
     <div class="product-image-wrap">
 
       <img
@@ -617,7 +994,9 @@ function createProductCard(product){
 
       ${
         product.tag
-        ? `<span class="product-tag">${product.tag}</span>`
+        ? `<span class="product-tag">
+             ${product.tag}
+           </span>`
         : ''
       }
 
@@ -634,7 +1013,9 @@ function createProductCard(product){
 
     <div class="product-info">
 
-      <h3>${product.name}</h3>
+      <h3>
+        ${product.name}
+      </h3>
 
       <div class="product-bottom">
 
@@ -652,22 +1033,28 @@ function createProductCard(product){
       </div>
 
     </div>
+
   `;
 
 
   const addButton =
-    card.querySelector('.add-to-bag');
+    card.querySelector(
+      '.add-to-bag'
+    );
 
 
   const heartButton =
-    card.querySelector('.product-heart');
+    card.querySelector(
+      '.product-heart'
+    );
 
 
   if(addButton){
 
     addButton.addEventListener(
       'click',
-      () => addToCart(product)
+      () =>
+        addToCart(product)
     );
 
   }
@@ -683,8 +1070,11 @@ function createProductCard(product){
           'saved'
         );
 
+
         heartButton.textContent =
-          heartButton.classList.contains('saved')
+          heartButton.classList.contains(
+            'saved'
+          )
           ? '♥'
           : '♡';
 
@@ -695,6 +1085,7 @@ function createProductCard(product){
 
 
   return card;
+
 }
 
 
@@ -707,22 +1098,29 @@ function renderProducts(list){
   if(!productsContainer)
     return;
 
-  productsContainer.innerHTML = '';
+
+  productsContainer.innerHTML =
+    '';
 
 
-  list.forEach(product => {
+  list.forEach(
+    product => {
 
-    productsContainer.appendChild(
-      createProductCard(product)
-    );
+      productsContainer.appendChild(
+        createProductCard(
+          product
+        )
+      );
 
-  });
+    }
+  );
 
 }
 
 
 /* =========================
-   LOAD PRODUCTS FROM GOOGLE SHEET
+   LOAD PRODUCTS
+   FROM GOOGLE SHEET
 ========================= */
 
 async function loadProductsFromSheet(){
@@ -730,26 +1128,35 @@ async function loadProductsFromSheet(){
   try{
 
     const response =
-      await fetch(PRODUCTS_API_URL, {
-        method:'GET',
-        cache:'no-store'
-      });
+      await fetch(
+        PRODUCTS_API_URL,
+        {
+          method:'GET',
+          cache:'no-store'
+        }
+      );
 
 
-    if(!response.ok)
+    if(!response.ok){
+
       throw new Error(
         'Products API error'
       );
+
+    }
 
 
     const data =
       await response.json();
 
 
-    if(!Array.isArray(data))
+    if(!Array.isArray(data)){
+
       throw new Error(
         'Invalid products data'
       );
+
+    }
 
 
     if(data.length === 0){
@@ -758,7 +1165,11 @@ async function loadProductsFromSheet(){
         'PRODUCTS sheet is empty. Using fallback products.'
       );
 
-      renderProducts(products);
+
+      renderProducts(
+        products
+      );
+
 
       return;
 
@@ -767,83 +1178,99 @@ async function loadProductsFromSheet(){
 
     const sheetProducts =
       data
-        .map((item,index) => {
+        .map(
+          (item,index) => {
 
-          const priceNumber =
-            Number(
-              String(
-                item.PRICE || ''
-              ).replace(
-                /[^0-9.]/g,
-                ''
-              )
+            const priceNumber =
+              Number(
+                String(
+                  item.PRICE || ''
+                ).replace(
+                  /[^0-9.]/g,
+                  ''
+                )
+              );
+
+
+            return {
+
+              id:
+                item.ID ||
+                `P${String(
+                  index + 1
+                ).padStart(
+                  3,
+                  '0'
+                )}`,
+
+              name:
+                String(
+                  item.NAME || ''
+                ).trim(),
+
+              priceNumber:
+                priceNumber || 0,
+
+              price:
+                formatPrice(
+                  priceNumber || 0
+                ),
+
+              tag:
+                String(
+                  item.BEST_SELLER || ''
+                )
+                .trim()
+                .toUpperCase() ===
+                'YES'
+                ? 'best seller'
+                : '',
+
+              category:
+                String(
+                  item.CATEGORY || ''
+                ).trim(),
+
+              description:
+                String(
+                  item.DESCRIPTION || ''
+                ).trim(),
+
+              image:
+                String(
+                  item.IMAGE || ''
+                ).trim()
+
+            };
+
+          }
+        )
+        .filter(
+          product => {
+
+            return (
+              product.name &&
+              product.priceNumber > 0 &&
+              product.image
             );
 
-
-          return {
-
-            id:
-              item.ID ||
-              `P${String(index + 1).padStart(3,'0')}`,
-
-            name:
-              String(
-                item.NAME || ''
-              ).trim(),
-
-            priceNumber:
-              priceNumber || 0,
-
-            price:
-              formatPrice(
-                priceNumber || 0
-              ),
-
-            tag:
-              String(
-                item.BEST_SELLER || ''
-              )
-              .trim()
-              .toUpperCase() === 'YES'
-              ? 'best seller'
-              : '',
-
-            category:
-              String(
-                item.CATEGORY || ''
-              ).trim(),
-
-            description:
-              String(
-                item.DESCRIPTION || ''
-              ).trim(),
-
-            image:
-              String(
-                item.IMAGE || ''
-              ).trim()
-
-          };
-
-        })
-        .filter(product => {
-
-          return (
-            product.name &&
-            product.priceNumber > 0 &&
-            product.image
-          );
-
-        });
+          }
+        );
 
 
-    if(sheetProducts.length === 0){
+    if(
+      sheetProducts.length === 0
+    ){
 
       console.log(
         'No valid products found. Using fallback products.'
       );
 
-      renderProducts(products);
+
+      renderProducts(
+        products
+      );
+
 
       return;
 
@@ -860,7 +1287,9 @@ async function loadProductsFromSheet(){
     );
 
 
-    renderProducts(products);
+    renderProducts(
+      products
+    );
 
 
   }catch(error){
@@ -871,43 +1300,71 @@ async function loadProductsFromSheet(){
     );
 
 
-    renderProducts(products);
+    renderProducts(
+      products
+    );
 
   }
 
 }
 
 
-/* Initial products first */
-renderProducts(products);
+/* =========================
+   INITIAL PRODUCTS
+========================= */
 
-/* Then load Sheet products */
+renderProducts(
+  products
+);
+
+
 loadProductsFromSheet();
+
 
 /* =========================
    PREMIUM SEARCH
 ========================= */
 
 const searchButton =
-  document.querySelector('.search-button');
+  document.querySelector(
+    '.search-button'
+  );
+
 
 const searchOverlay =
-  document.querySelector('#search-overlay');
+  document.querySelector(
+    '#search-overlay'
+  );
+
 
 const searchClose =
-  document.querySelector('#search-close');
+  document.querySelector(
+    '#search-close'
+  );
+
 
 const productSearch =
-  document.querySelector('#product-search');
+  document.querySelector(
+    '#product-search'
+  );
+
 
 const searchClear =
-  document.querySelector('#search-clear');
+  document.querySelector(
+    '#search-clear'
+  );
+
 
 const searchResults =
-  document.querySelector('#search-results');
+  document.querySelector(
+    '#search-results'
+  );
+
 
 const searchHint =
-  document.querySelector('#search-hint');
+  document.querySelector(
+    '#search-hint'
+  );
 
 
 function openSearch(){
@@ -916,7 +1373,9 @@ function openSearch(){
     return;
 
 
-  searchOverlay.classList.add('open');
+  searchOverlay.classList.add(
+    'open'
+  );
 
 
   searchOverlay.setAttribute(
@@ -966,15 +1425,18 @@ function closeSearch(){
 
 
   if(productSearch)
-    productSearch.value = '';
+    productSearch.value =
+      '';
 
 
   if(searchClear)
-    searchClear.hidden = true;
+    searchClear.hidden =
+      true;
 
 
   if(searchResults)
-    searchResults.innerHTML = '';
+    searchResults.innerHTML =
+      '';
 
 
   if(searchHint){
@@ -999,9 +1461,12 @@ function performSearch(){
       .trim();
 
 
-  if(searchClear)
+  if(searchClear){
+
     searchClear.hidden =
       !query;
+
+  }
 
 
   if(!searchResults)
@@ -1010,7 +1475,8 @@ function performSearch(){
 
   if(!query){
 
-    searchResults.innerHTML = '';
+    searchResults.innerHTML =
+      '';
 
 
     if(searchHint){
@@ -1020,26 +1486,37 @@ function performSearch(){
 
     }
 
+
     return;
 
   }
 
 
   const matches =
-    products.filter(product => {
+    products.filter(
+      product => {
 
-      const text = `
-        ${product.name}
-        ${product.tag}
-        ${product.price}
-        ${product.category}
-        ${product.description}
-      `.toLowerCase();
+        const text = `
+
+          ${product.name}
+
+          ${product.tag}
+
+          ${product.price}
+
+          ${product.category}
+
+          ${product.description}
+
+        `.toLowerCase();
 
 
-      return text.includes(query);
+        return text.includes(
+          query
+        );
 
-    });
+      }
+    );
 
 
   if(searchHint){
@@ -1056,12 +1533,14 @@ function performSearch(){
   }
 
 
-  searchResults.innerHTML = '';
+  searchResults.innerHTML =
+    '';
 
 
   if(matches.length === 0){
 
     searchResults.innerHTML = `
+
       <div class="search-no-results">
 
         <div class="search-no-icon">
@@ -1077,129 +1556,133 @@ function performSearch(){
         </p>
 
       </div>
+
     `;
+
 
     return;
 
   }
 
 
-  matches.forEach(product => {
+  matches.forEach(
+    product => {
 
-    const result =
-      document.createElement('article');
-
-
-    result.className =
-      'search-result-card';
-
-
-    result.innerHTML = `
-
-      <img
-        src="${product.image}"
-        alt="${product.name}"
-      >
+      const result =
+        document.createElement(
+          'article'
+        );
 
 
-      <div class="search-result-info">
-
-        ${
-          product.tag
-          ? `<span>${product.tag}</span>`
-          : ''
-        }
+      result.className =
+        'search-result-card';
 
 
-        <h3>
-          ${product.name}
-        </h3>
+      result.innerHTML = `
+
+        <img
+          src="${product.image}"
+          alt="${product.name}"
+        >
 
 
-        <p>
-          ${product.price}
-        </p>
+        <div class="search-result-info">
 
-      </div>
-
-
-      <button
-        type="button"
-        class="search-add-button"
-      >
-        +
-      </button>
-
-    `;
+          ${
+            product.tag
+            ? `<span>${product.tag}</span>`
+            : ''
+          }
 
 
-    const addButton =
-      result.querySelector(
-        '.search-add-button'
-      );
+          <h3>
+            ${product.name}
+          </h3>
 
 
-    if(addButton){
+          <p>
+            ${product.price}
+          </p>
 
-      addButton.addEventListener(
-        'click',
-        event => {
-
-          event.stopPropagation();
-
-          addToCart(product);
-
-          closeSearch();
-
-        }
-      );
-
-    }
+        </div>
 
 
-    result.addEventListener(
-      'click',
-      event => {
+        <button
+          type="button"
+          class="search-add-button"
+        >
+          +
+        </button>
 
-        if(
-          event.target.closest(
-            '.search-add-button'
-          )
-        )
-          return;
+      `;
 
 
-        closeSearch();
+      const addButton =
+        result.querySelector(
+          '.search-add-button'
+        );
 
 
-        setTimeout(
-          () => {
+      if(addButton){
 
-            const shop =
-              document.querySelector('#shop');
+        addButton.addEventListener(
+          'click',
+          event => {
 
+            event.stopPropagation();
 
-            if(shop){
+            addToCart(
+              product
+            );
 
-              shop.scrollIntoView({
-                behavior:'smooth'
-              });
+            closeSearch();
 
-            }
-
-          },
-          100
+          }
         );
 
       }
-    );
 
 
-    searchResults.appendChild(
-      result
-    );
+      result.addEventListener(
+        'click',
+        event => {
 
-  });
+          if(
+            event.target.closest(
+              '.search-add-button'
+            )
+          ){
+
+            return;
+
+          }
+
+
+          /*
+           * Send search to Shop page.
+           */
+
+          const queryText =
+            product.name;
+
+
+          window.location.href =
+            `shop.html?search=${
+              encodeURIComponent(
+                queryText
+              )
+            }`;
+
+        }
+      );
+
+
+      searchResults.appendChild(
+        result
+      );
+
+    }
+  );
 
 }
 
@@ -1236,8 +1719,31 @@ if(productSearch){
     'keydown',
     event => {
 
-      if(event.key === 'Escape')
+      if(event.key === 'Enter'){
+
+        const query =
+          productSearch.value.trim();
+
+
+        if(query){
+
+          window.location.href =
+            `shop.html?search=${
+              encodeURIComponent(
+                query
+              )
+            }`;
+
+        }
+
+      }
+
+
+      if(event.key === 'Escape'){
+
         closeSearch();
+
+      }
 
     }
   );
@@ -1253,11 +1759,13 @@ if(searchClear){
 
       if(productSearch){
 
-        productSearch.value = '';
+        productSearch.value =
+          '';
 
         productSearch.focus();
 
       }
+
 
       performSearch();
 
@@ -1274,9 +1782,13 @@ if(searchOverlay){
     event => {
 
       if(
-        event.target === searchOverlay
-      )
+        event.target ===
+        searchOverlay
+      ){
+
         closeSearch();
+
+      }
 
     }
   );
@@ -1291,7 +1803,9 @@ document.addEventListener(
     if(
       event.key === 'Escape' &&
       searchOverlay &&
-      searchOverlay.classList.contains('open')
+      searchOverlay.classList.contains(
+        'open'
+      )
     ){
 
       closeSearch();
@@ -1300,7 +1814,6 @@ document.addEventListener(
 
   }
 );
-
 
 /* =========================
    INSTAGRAM GRID
@@ -1314,14 +1827,17 @@ const instagramGrid =
 
 if(instagramGrid){
 
-  instagramGrid.innerHTML = '';
+  instagramGrid.innerHTML =
+    '';
 
 
   instagramImages.forEach(
     image => {
 
       const link =
-        document.createElement('a');
+        document.createElement(
+          'a'
+        );
 
 
       link.href =
@@ -1337,7 +1853,9 @@ if(instagramGrid){
 
 
       const img =
-        document.createElement('img');
+        document.createElement(
+          'img'
+        );
 
 
       img.src =
@@ -1348,14 +1866,20 @@ if(instagramGrid){
         'THEE PETAL AND CO Instagram';
 
 
-      link.appendChild(img);
+      link.appendChild(
+        img
+      );
 
-      instagramGrid.appendChild(link);
+
+      instagramGrid.appendChild(
+        link
+      );
 
     }
   );
 
 }
+
 
 /* =========================
    MOBILE MENU
@@ -1366,15 +1890,18 @@ const drawer =
     '#mobile-drawer'
   );
 
+
 const backdrop =
   document.querySelector(
     '#drawer-backdrop'
   );
 
+
 const menuOpen =
   document.querySelector(
     '#menu-open'
   );
+
 
 const menuClose =
   document.querySelector(
@@ -1422,7 +1949,8 @@ if(menuOpen){
 
   menuOpen.addEventListener(
     'click',
-    () => toggleMenu(true)
+    () =>
+      toggleMenu(true)
   );
 
 }
@@ -1432,7 +1960,8 @@ if(menuClose){
 
   menuClose.addEventListener(
     'click',
-    () => toggleMenu(false)
+    () =>
+      toggleMenu(false)
   );
 
 }
@@ -1442,7 +1971,8 @@ if(backdrop){
 
   backdrop.addEventListener(
     'click',
-    () => toggleMenu(false)
+    () =>
+      toggleMenu(false)
   );
 
 }
@@ -1450,20 +1980,19 @@ if(backdrop){
 
 if(drawer){
 
-  const links =
-    drawer.querySelectorAll('a');
+  drawer
+    .querySelectorAll('a')
+    .forEach(
+      link => {
 
+        link.addEventListener(
+          'click',
+          () =>
+            toggleMenu(false)
+        );
 
-  links.forEach(
-    link => {
-
-      link.addEventListener(
-        'click',
-        () => toggleMenu(false)
-      );
-
-    }
-  );
+      }
+    );
 
 }
 
@@ -1477,25 +2006,30 @@ const customForm =
     '#custom-form'
   );
 
+
 const successMessage =
   document.querySelector(
     '#form-success'
   );
+
 
 const photoInput =
   document.querySelector(
     '#photo'
   );
 
+
 const photoData =
   document.querySelector(
     '#photoData'
   );
 
+
 const photoName =
   document.querySelector(
     '#photoName'
   );
+
 
 const photoMimeType =
   document.querySelector(
@@ -1519,7 +2053,9 @@ if(customForm){
           : null;
 
 
-      /* NO PHOTO */
+      /*
+       * NO PHOTO
+       */
 
       if(!file){
 
@@ -1529,11 +2065,18 @@ if(customForm){
         setTimeout(
           () => {
 
-            if(successMessage)
-              successMessage.hidden = false;
+            if(successMessage){
+
+              successMessage.hidden =
+                false;
+
+            }
 
 
-            customForm.reset();
+            /*
+             * Don't clear the
+             * cart automatically.
+             */
 
           },
           1500
@@ -1545,7 +2088,9 @@ if(customForm){
       }
 
 
-      /* PHOTO */
+      /*
+       * PHOTO UPLOAD
+       */
 
       const reader =
         new FileReader();
@@ -1567,19 +2112,31 @@ if(customForm){
                 );
 
 
-              const maxWidth = 1200;
-              const maxHeight = 1200;
+              const maxWidth =
+                1200;
 
 
-              let width = img.width;
-              let height = img.height;
+              const maxHeight =
+                1200;
+
+
+              let width =
+                img.width;
+
+
+              let height =
+                img.height;
 
 
               if(width > maxWidth){
 
                 height =
                   height *
-                  (maxWidth / width);
+                  (
+                    maxWidth /
+                    width
+                  );
+
 
                 width =
                   maxWidth;
@@ -1591,7 +2148,11 @@ if(customForm){
 
                 width =
                   width *
-                  (maxHeight / height);
+                  (
+                    maxHeight /
+                    height
+                  );
+
 
                 height =
                   maxHeight;
@@ -1601,6 +2162,7 @@ if(customForm){
 
               canvas.width =
                 width;
+
 
               canvas.height =
                 height;
@@ -1670,11 +2232,12 @@ if(customForm){
               setTimeout(
                 () => {
 
-                  if(successMessage)
-                    successMessage.hidden = false;
+                  if(successMessage){
 
+                    successMessage.hidden =
+                      false;
 
-                  customForm.reset();
+                  }
 
                 },
                 1500
@@ -1689,7 +2252,9 @@ if(customForm){
         };
 
 
-      reader.readAsDataURL(file);
+      reader.readAsDataURL(
+        file
+      );
 
     }
   );
@@ -1698,8 +2263,357 @@ if(customForm){
 
 
 /* =========================
+   LOAD CART ORDER
+   AFTER PAGE LOAD
+========================= */
+
+function restoreCartOrder(){
+
+  try{
+
+    const savedOrder =
+      sessionStorage.getItem(
+        'petalCartOrder'
+      );
+
+
+    if(!savedOrder)
+      return;
+
+
+    const order =
+      JSON.parse(
+        savedOrder
+      );
+
+
+    if(
+      !order ||
+      !Array.isArray(
+        order.products
+      ) ||
+      order.products.length === 0
+    ){
+
+      return;
+
+    }
+
+
+    const productField =
+      document.querySelector(
+        '#product'
+      );
+
+
+    const budgetField =
+      document.querySelector(
+        '#budget'
+      );
+
+
+    const messageField =
+      document.querySelector(
+        '#message'
+      );
+
+
+    const categories =
+      order.products
+        .map(
+          item =>
+            String(
+              item.category || ''
+            ).trim()
+        )
+        .filter(Boolean);
+
+
+    const uniqueCategories =
+      [
+        ...new Set(
+          categories
+        )
+      ];
+
+
+    const categoryText =
+      uniqueCategories.join(
+        ' + '
+      );
+
+
+    const productDetails =
+      order.products
+        .map(
+          item => {
+
+            const category =
+              item.category
+                ? ` — ${item.category}`
+                : '';
+
+
+            const price =
+              formatPrice(
+                item.priceNumber
+              );
+
+
+            return (
+              `${item.name}${category} × ` +
+              `${item.quantity} (${price} each)`
+            );
+
+          }
+        )
+        .join('\n');
+
+
+    const total =
+      Number(
+        order.total || 0
+      );
+
+
+    const totalText =
+      formatPrice(
+        total
+      );
+
+
+    /* =====================
+       PRODUCT FIELD
+    ===================== */
+
+    if(productField){
+
+      if(
+        productField.tagName ===
+        'SELECT'
+      ){
+
+        const old =
+          productField.querySelector(
+            'option[data-cart-order="true"]'
+          );
+
+
+        if(old)
+          old.remove();
+
+
+        const matchingOption =
+          [...productField.options]
+            .find(
+              option =>
+                option.value
+                  .toLowerCase() ===
+                categoryText
+                  .toLowerCase()
+            );
+
+
+        if(
+          matchingOption &&
+          !categoryText.includes('+')
+        ){
+
+          productField.value =
+            matchingOption.value;
+
+        }else{
+
+          const option =
+            document.createElement(
+              'option'
+            );
+
+
+          option.value =
+            categoryText ||
+            'Custom Gifts';
+
+
+          option.textContent =
+            categoryText
+              ? `Cart: ${categoryText}`
+              : 'Cart Order';
+
+
+          option.selected =
+            true;
+
+
+          option.dataset.cartOrder =
+            'true';
+
+
+          productField.insertBefore(
+            option,
+            productField.firstChild
+          );
+
+        }
+
+      }else{
+
+        productField.value =
+          categoryText ||
+          'Custom Gifts';
+
+      }
+
+    }
+
+
+    /* =====================
+       BUDGET FIELD
+    ===================== */
+
+    if(budgetField){
+
+      const old =
+        budgetField.querySelector(
+          'option[data-cart-budget="true"]'
+        );
+
+
+      if(old)
+        old.remove();
+
+
+      if(
+        budgetField.tagName ===
+        'SELECT'
+      ){
+
+        const option =
+          document.createElement(
+            'option'
+          );
+
+
+        option.value =
+          totalText;
+
+
+        option.textContent =
+          `Cart Total: ${totalText}`;
+
+
+        option.selected =
+          true;
+
+
+        option.dataset.cartBudget =
+          'true';
+
+
+        budgetField.insertBefore(
+          option,
+          budgetField.firstChild
+        );
+
+      }else{
+
+        budgetField.value =
+          totalText;
+
+      }
+
+    }
+
+
+    /* =====================
+       MESSAGE FIELD
+    ===================== */
+
+    if(messageField){
+
+      const orderText =
+`Selected Cart Items:
+${productDetails}
+
+Categories:
+${categoryText || 'Custom Gifts'}
+
+Total:
+${totalText}`;
+
+
+      const existing =
+        messageField.value.trim();
+
+
+      const marker =
+        'Selected Cart Items:';
+
+
+      let cleanExisting =
+        existing;
+
+
+      const oldIndex =
+        cleanExisting.indexOf(
+          marker
+        );
+
+
+      if(oldIndex !== -1){
+
+        cleanExisting =
+          cleanExisting
+            .substring(
+              0,
+              oldIndex
+            )
+            .trim();
+
+      }
+
+
+      messageField.value =
+        cleanExisting
+          ? `${cleanExisting}\n\n${orderText}`
+          : orderText;
+
+    }
+
+
+    /*
+     * Remove only the temporary
+     * navigation data.
+     */
+
+    sessionStorage.removeItem(
+      'petalCartOrder'
+    );
+
+
+  }catch(error){
+
+    console.error(
+      'Could not restore cart order:',
+      error
+    );
+
+  }
+
+}
+
+
+/* =========================
+   RESTORE ORDER
+========================= */
+
+restoreCartOrder();
+
+
+/* =========================
    FINAL INITIALIZATION
 ========================= */
 
 updateCartCount();
+
 renderCart();
