@@ -28,7 +28,8 @@ body{
 }
 
 body.cart-open,
-body.menu-open{
+body.menu-open,
+body.search-open{
   overflow:hidden;
 }
 
@@ -55,10 +56,7 @@ button{
   padding-right:40px;
 }
 
-
-/* =========================
-   ANNOUNCEMENT
-========================= */
+/* ANNOUNCEMENT */
 
 .announcement{
   background:var(--red);
@@ -73,10 +71,7 @@ button{
   margin:0 10px;
 }
 
-
-/* =========================
-   HEADER
-========================= */
+/* HEADER */
 
 .site-header{
   position:sticky;
@@ -159,10 +154,221 @@ button{
   display:none;
 }
 
+/* PREMIUM SEARCH */
 
-/* =========================
-   HERO
-========================= */
+.search-overlay{
+  position:fixed;
+  inset:0;
+  z-index:200;
+  background:rgba(252,247,237,.97);
+  backdrop-filter:blur(18px);
+  opacity:0;
+  visibility:hidden;
+  pointer-events:none;
+  transition:opacity .3s ease,visibility .3s ease;
+}
+
+.search-overlay.open{
+  opacity:1;
+  visibility:visible;
+  pointer-events:auto;
+}
+
+.search-overlay-inner{
+  width:min(900px,92%);
+  margin:0 auto;
+  padding-top:90px;
+}
+
+.search-top{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  margin-bottom:28px;
+}
+
+.search-top .eyebrow{
+  margin:0;
+}
+
+.search-close{
+  width:46px;
+  height:46px;
+  border:1px solid var(--line);
+  background:#fffaf2;
+  border-radius:50%;
+  font-size:28px;
+  line-height:1;
+  color:var(--brown);
+  transition:.2s;
+}
+
+.search-close:hover{
+  background:var(--red);
+  color:#fff;
+  border-color:var(--red);
+}
+
+.search-box{
+  display:flex;
+  align-items:center;
+  gap:14px;
+  background:#fffaf2;
+  border:1px solid var(--line);
+  border-radius:20px;
+  padding:7px 12px 7px 20px;
+  box-shadow:0 15px 45px rgba(78,40,31,.08);
+}
+
+.search-symbol{
+  font-size:27px;
+  color:var(--red);
+}
+
+#product-search{
+  flex:1;
+  border:0;
+  outline:0;
+  background:transparent;
+  color:var(--brown);
+  font-size:18px;
+  padding:15px 0;
+}
+
+#product-search::placeholder{
+  color:#aa8b7d;
+}
+
+#search-clear{
+  border:0;
+  background:transparent;
+  width:40px;
+  height:40px;
+  border-radius:50%;
+  font-size:24px;
+  color:#8d6b60;
+}
+
+#search-clear:hover{
+  background:#f3dfd2;
+}
+
+.search-hint{
+  padding:18px 4px;
+  color:#98766a;
+  font-size:12px;
+  letter-spacing:.04em;
+}
+
+.search-results{
+  display:grid;
+  gap:12px;
+  max-height:58vh;
+  overflow-y:auto;
+  padding-right:5px;
+}
+
+.search-result-card{
+  display:flex;
+  align-items:center;
+  gap:18px;
+  background:#fffaf2;
+  border:1px solid var(--line);
+  border-radius:18px;
+  padding:12px;
+  cursor:pointer;
+  transition:transform .2s ease,box-shadow .2s ease,border-color .2s ease;
+}
+
+.search-result-card:hover{
+  transform:translateY(-2px);
+  border-color:#d9b6a8;
+  box-shadow:0 12px 30px rgba(78,40,31,.08);
+}
+
+.search-result-card img{
+  width:76px;
+  height:86px;
+  object-fit:cover;
+  border-radius:12px;
+  flex-shrink:0;
+}
+
+.search-result-info{
+  flex:1;
+  min-width:0;
+}
+
+.search-result-info span{
+  display:inline-block;
+  font-size:9px;
+  text-transform:uppercase;
+  letter-spacing:.13em;
+  color:var(--red);
+  margin-bottom:5px;
+}
+
+.search-result-info h3{
+  margin:0;
+  font-family:'Playfair Display',serif;
+  font-size:20px;
+  font-weight:400;
+  color:var(--brown);
+}
+
+.search-result-info p{
+  margin:6px 0 0;
+  color:#8b6b5e;
+  font-size:13px;
+}
+
+.search-add-button{
+  width:42px;
+  height:42px;
+  flex-shrink:0;
+  border:0;
+  border-radius:50%;
+  background:var(--red);
+  color:#fff;
+  font-size:25px;
+  line-height:1;
+  transition:.2s;
+}
+
+.search-add-button:hover{
+  background:var(--red-dark);
+  transform:scale(1.05);
+}
+
+.search-no-results{
+  text-align:center;
+  padding:70px 20px;
+  background:#fffaf2;
+  border:1px solid var(--line);
+  border-radius:22px;
+}
+
+.search-no-icon{
+  font-family:'Playfair Display',serif;
+  font-size:42px;
+  color:var(--red);
+  margin-bottom:10px;
+}
+
+.search-no-results h3{
+  margin:0 0 8px;
+  font-family:'Playfair Display',serif;
+  font-size:28px;
+  font-weight:400;
+}
+
+.search-no-results p{
+  margin:0;
+  color:#8d6b60;
+  font-size:14px;
+}
+
+/* HERO */
 
 .hero{
   display:grid;
@@ -245,9 +451,7 @@ h2 em{
 }
 
 
-/* =========================
-   HERO ART
-========================= */
+/* HERO ART */
 
 .hero-art{
   position:relative;
@@ -294,9 +498,7 @@ h2 em{
 }
 
 
-/* =========================
-   SHOP
-========================= */
+/* SHOP */
 
 .shop-section{
   background:var(--paper);
@@ -325,9 +527,7 @@ h2 em{
 }
 
 
-/* =========================
-   PRODUCTS
-========================= */
+/* PRODUCTS */
 
 .products{
   display:grid;
@@ -437,9 +637,7 @@ h2 em{
 }
 
 
-/* =========================
-   STORY
-========================= */
+/* STORY */
 
 .story{
   display:grid;
@@ -481,9 +679,7 @@ h2 em{
 }
 
 
-/* =========================
-   CUSTOM ORDER
-========================= */
+/* CUSTOM ORDER */
 
 .custom-section{
   background:var(--paper);
@@ -512,9 +708,7 @@ h2 em{
 }
 
 
-/* =========================
-   CUSTOM FORM
-========================= */
+/* CUSTOM FORM */
 
 .custom-form{
   background:var(--cream);
@@ -565,10 +759,6 @@ h2 em{
   padding:10px;
 }
 
-.custom-form button{
-  border:0;
-}
-
 #form-success{
   background:#e7f1df;
   color:#38552d;
@@ -577,42 +767,76 @@ h2 em{
   font-size:13px;
 }
 
+/* REVIEWS */
 
-/* =========================
-   REVIEWS
-========================= */
+.reviews{
+  padding-top:90px;
+  padding-bottom:100px;
+}
+
+.reviews .section-heading{
+  margin-bottom:38px;
+}
 
 .review-grid{
   display:grid;
   grid-template-columns:repeat(3,1fr);
-  gap:16px;
+  gap:22px;
 }
 
 .review-grid article{
-  padding:24px;
-  border:1px solid var(--line);
-  border-radius:18px;
-  background:#fffaf2;
+  position:relative;
+  background:#fffaf5;
+  border:1px solid rgba(111,58,45,.12);
+  border-radius:24px;
+  padding:30px 28px 27px;
+  min-height:205px;
+  display:flex;
+  flex-direction:column;
+  justify-content:space-between;
+  box-shadow:0 10px 30px rgba(79,42,31,.06);
+  transition:transform .25s ease,box-shadow .25s ease;
+}
+
+.review-grid article:hover{
+  transform:translateY(-5px);
+  box-shadow:0 16px 35px rgba(79,42,31,.10);
 }
 
 .stars{
-  color:#c47a48;
+  font-size:15px;
   letter-spacing:3px;
+  margin-bottom:18px;
 }
 
 .review-grid article p{
-  font:22px/1.35 'Playfair Display',serif;
+  margin:0;
+  color:#4d3932;
+  font-size:16px;
+  line-height:1.7;
 }
 
-.review-grid small{
-  font-size:13px;
-  color:#97786c;
+.review-grid article small{
+  display:block;
+  margin-top:24px;
+  padding-top:17px;
+  border-top:1px solid rgba(111,58,45,.10);
+  color:#876b60;
+  font-size:12px;
+  letter-spacing:.4px;
+}
+
+.review-grid article::after{
+  content:"♡";
+  position:absolute;
+  right:22px;
+  top:18px;
+  font-size:25px;
+  opacity:.18;
 }
 
 
-/* =========================
-   INSTAGRAM
-========================= */
+/* INSTAGRAM */
 
 .instagram{
   background:var(--blush);
@@ -651,9 +875,7 @@ h2 em{
 }
 
 
-/* =========================
-   FOOTER
-========================= */
+/* FOOTER */
 
 footer{
   background:var(--red);
@@ -696,9 +918,7 @@ footer{
 }
 
 
-/* ==================================================
-   CART DRAWER
-================================================== */
+/* CART DRAWER */
 
 .cart-backdrop{
   position:fixed;
@@ -882,9 +1102,7 @@ footer{
 }
 
 
-/* ==================================================
-   MOBILE MENU
-================================================== */
+/* MOBILE MENU */
 
 .mobile-drawer,
 .drawer-backdrop{
@@ -892,9 +1110,7 @@ footer{
 }
 
 
-/* ==================================================
-   MOBILE
-================================================== */
+/* MOBILE */
 
 @media(max-width:800px){
 
@@ -908,9 +1124,12 @@ footer{
     padding:0 18px;
   }
 
-  .desktop-nav,
-  .search-button{
+  .desktop-nav{
     display:none;
+  }
+
+  .search-button{
+    display:block;
   }
 
   .mobile-only{
@@ -1008,6 +1227,36 @@ footer{
 
   .review-grid{
     grid-template-columns:1fr;
+    gap:14px;
+  }
+
+  .reviews{
+    padding-top:65px;
+    padding-bottom:70px;
+  }
+
+  .reviews .section-heading{
+    margin-bottom:28px;
+  }
+
+  .reviews .section-heading>a{
+    display:none;
+  }
+
+  .review-grid article{
+    min-height:auto;
+    padding:25px 22px;
+    border-radius:20px;
+  }
+
+  .review-grid article p{
+    font-size:15px;
+    line-height:1.65;
+  }
+
+  .review-grid article small{
+    margin-top:20px;
+    padding-top:14px;
   }
 
   .instagram-grid{
@@ -1025,51 +1274,8 @@ footer{
     flex-wrap:wrap;
   }
 
-  .mobile-drawer{
-    position:fixed;
-    display:block;
-    z-index:50;
-    inset:0 auto 0 0;
-    width:82%;
-    padding:24px;
-    background:var(--cream);
-    transform:translateX(-100%);
-    transition:.3s;
-  }
 
-  .mobile-drawer.open{
-    transform:translateX(0);
-  }
-
-  .drawer-close{
-    border:0;
-    background:transparent;
-    font-size:34px;
-  }
-
-  .mobile-drawer nav{
-    display:flex;
-    flex-direction:column;
-    gap:28px;
-    margin-top:64px;
-    font:32px 'Playfair Display',serif;
-  }
-
-  .drawer-backdrop{
-    position:fixed;
-    inset:0;
-    z-index:40;
-    display:block;
-    background:rgba(78,40,31,.3);
-    opacity:0;
-    pointer-events:none;
-    transition:.3s;
-  }
-
-  .drawer-backdrop.open{
-    opacity:1;
-    pointer-events:auto;
-  }
+  /* CART */
 
   .cart-drawer{
     width:92vw;
@@ -1093,12 +1299,68 @@ footer{
     height:88px;
   }
 
+
+  /* SEARCH */
+
+  .search-overlay-inner{
+    width:calc(100% - 32px);
+    padding-top:30px;
+  }
+
+  .search-top{
+    margin-bottom:20px;
+  }
+
+  .search-top .eyebrow{
+    font-size:9px;
+  }
+
+  .search-close{
+    width:42px;
+    height:42px;
+  }
+
+  .search-box{
+    border-radius:16px;
+    padding-left:15px;
+  }
+
+  .search-symbol{
+    font-size:23px;
+  }
+
+  #product-search{
+    font-size:16px;
+    padding:13px 0;
+  }
+
+  .search-results{
+    max-height:65vh;
+  }
+
+  .search-result-card{
+    gap:12px;
+    padding:9px;
+  }
+
+  .search-result-card img{
+    width:62px;
+    height:72px;
+    border-radius:10px;
+  }
+
+  .search-result-info h3{
+    font-size:17px;
+  }
+
+  .search-add-button{
+    width:38px;
+    height:38px;
+    font-size:22px;
+  }
 }
 
-
-/* ==================================================
-   SMALL PHONES
-================================================== */
+/* SMALL PHONES */
 
 @media(max-width:380px){
 
@@ -1128,119 +1390,22 @@ footer{
     width:96vw;
   }
 
-}
-
-/* =========================
-   REVIEWS — PREMIUM STYLE
-========================= */
-
-.reviews{
-  padding-top:90px;
-  padding-bottom:100px;
-}
-
-.reviews .section-heading{
-  margin-bottom:38px;
-}
-
-.review-grid{
-  display:grid;
-  grid-template-columns:repeat(3,1fr);
-  gap:22px;
-}
-
-.review-grid article{
-  position:relative;
-  background:#fffaf5;
-  border:1px solid rgba(111,58,45,.12);
-  border-radius:24px;
-  padding:30px 28px 27px;
-  min-height:205px;
-
-  display:flex;
-  flex-direction:column;
-  justify-content:space-between;
-
-  box-shadow:0 10px 30px rgba(79,42,31,.06);
-  transition:transform .25s ease, box-shadow .25s ease;
-}
-
-.review-grid article:hover{
-  transform:translateY(-5px);
-  box-shadow:0 16px 35px rgba(79,42,31,.10);
-}
-
-.stars{
-  font-size:15px;
-  letter-spacing:3px;
-  margin-bottom:18px;
-}
-
-.review-grid article p{
-  margin:0;
-  color:#4d3932;
-  font-size:16px;
-  line-height:1.7;
-}
-
-.review-grid article small{
-  display:block;
-  margin-top:24px;
-  padding-top:17px;
-  border-top:1px solid rgba(111,58,45,.10);
-
-  color:#876b60;
-  font-size:12px;
-  letter-spacing:.4px;
-}
-
-/* little decorative heart */
-.review-grid article::after{
-  content:"♡";
-  position:absolute;
-  right:22px;
-  top:18px;
-  font-size:25px;
-  opacity:.18;
-}
-
-
-/* MOBILE */
-
-@media(max-width:800px){
-
-  .reviews{
-    padding-top:65px;
-    padding-bottom:70px;
+  .search-overlay-inner{
+    width:calc(100% - 24px);
   }
 
-  .reviews .section-heading{
-    margin-bottom:28px;
+  .search-result-card img{
+    width:56px;
+    height:66px;
   }
 
-  .reviews .section-heading > a{
-    display:none;
-  }
-
-  .review-grid{
-    grid-template-columns:1fr;
-    gap:14px;
-  }
-
-  .review-grid article{
-    min-height:auto;
-    padding:25px 22px;
-    border-radius:20px;
-  }
-
-  .review-grid article p{
+  .search-result-info h3{
     font-size:15px;
-    line-height:1.65;
   }
 
-  .review-grid article small{
-    margin-top:20px;
-    padding-top:14px;
+  .search-add-button{
+    width:34px;
+    height:34px;
   }
 
 }
