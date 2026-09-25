@@ -309,7 +309,7 @@ function renderCart(){
 
   const oldItems =
     cartItems.querySelectorAll(
-      ".cart-product"
+      ".cart-item"
     );
 
   oldItems.forEach(
@@ -346,33 +346,33 @@ function renderCart(){
         document.createElement("div");
 
       row.className =
-        "cart-product";
+        "cart-item";
 
 
       row.innerHTML = `
 
-        <div class="cart-product-image">
-          <img
+        <img
             src="${item.image}"
             alt="${item.name}"
-          >
-        </div>
+          class="cart-item-image"
+        >
 
-        <div class="cart-product-info">
+        <div class="cart-item-info">
 
           <strong>
             ${item.name}
           </strong>
 
-          <span>
+          <p>
             ${item.price}
-          </span>
+          </p>
 
-          <div class="cart-product-controls">
+          <div class="cart-item-bottom">
+            <div class="quantity-controls">
 
             <button
               type="button"
-              class="cart-minus"
+              class="qty-minus"
             >
               −
             </button>
@@ -383,11 +383,12 @@ function renderCart(){
 
             <button
               type="button"
-              class="cart-plus"
+              class="qty-plus"
             >
               +
             </button>
 
+            </div>
           </div>
 
         </div>
@@ -404,7 +405,7 @@ function renderCart(){
 
 
       row
-        .querySelector(".cart-minus")
+        .querySelector(".qty-minus")
         .addEventListener(
           "click",
           function(){
@@ -419,7 +420,7 @@ function renderCart(){
 
 
       row
-        .querySelector(".cart-plus")
+        .querySelector(".qty-plus")
         .addEventListener(
           "click",
           function(){
@@ -855,86 +856,75 @@ document.addEventListener(
 );
 
 /* =====================================================
-   GOOGLE SHEET PRODUCTS
-   CACHE FIRST + BACKGROUND UPDATE
+   HOME PRODUCTS — FIXED / INSTANT LOAD
 ===================================================== */
 
-function normalizeProduct(raw){
+/*
+  HOME_PRODUCTS sirf Home page ke liye hain.
+  Shop page apne Google Sheet se products load karta hai.
 
-  const priceNumber =
-    Number(
-      String(raw.PRICE || "")
-        .replace(/[₹,\s]/g, "")
-    ) || 0;
+  Jab actual products ready hon, isi array mein
+  NAME / PRICE / DESCRIPTION / IMAGE edit karna hai.
+*/
 
+const HOME_PRODUCTS = [
 
-  const category =
-    String(
-      raw.CATEGORY || ""
-    ).trim();
+  {
+    id: "P001",
+    name: "The Pink Promise",
+    priceNumber: 899,
+    price: "₹899",
+    category: "Bouquets",
+    description: "A soft handmade pink flower bouquet, tied with love.",
+    image: "https://images.unsplash.com/photo-1523438885200-e635ba2c371e?auto=format&fit=crop&w=900&q=85",
+    bestSeller: true,
+    newArrival: false,
+    active: true
+  },
 
+  {
+    id: "P002",
+    name: "Strawberry Fields",
+    priceNumber: 699,
+    price: "₹699",
+    category: "Handmade Flowers",
+    description: "A sweet handmade bloom arrangement for a little surprise.",
+    image: "https://images.unsplash.com/photo-1490750967868-88aa4486c946?auto=format&fit=crop&w=900&q=85",
+    bestSeller: false,
+    newArrival: true,
+    active: true
+  },
 
-  const bestSeller =
-    String(
-      raw.BEST_SELLER || ""
-    )
-    .trim()
-    .toUpperCase() === "YES";
+  {
+    id: "P003",
+    name: "Sunshine, Always",
+    priceNumber: 799,
+    price: "₹799",
+    category: "Bouquets",
+    description: "A cheerful handmade bouquet made to brighten their day.",
+    image: "https://images.unsplash.com/photo-1527061011665-3652c757a4d4?auto=format&fit=crop&w=900&q=85",
+    bestSeller: false,
+    newArrival: false,
+    active: true
+  },
 
+  {
+    id: "P004",
+    name: "A Little Something",
+    priceNumber: 499,
+    price: "₹499",
+    category: "Just Because",
+    description: "A simple handmade gift for no reason other than love.",
+    image: "https://images.unsplash.com/photo-1455582916367-25f75bfc6710?auto=format&fit=crop&w=900&q=85",
+    bestSeller: false,
+    newArrival: true,
+    active: true
+  }
 
-  const active =
-    String(
-      raw.ACTIVE || ""
-    )
-    .trim()
-    .toUpperCase() === "YES";
+];
 
+products = HOME_PRODUCTS.slice();
 
-  return {
-
-    id: String(
-      raw.ID || ""
-    ).trim(),
-
-    name: String(
-      raw.NAME || ""
-    ).trim(),
-
-    priceNumber: priceNumber,
-
-    price: formatPrice(
-      priceNumber
-    ),
-
-    category: category,
-
-    description: String(
-      raw.DESCRIPTION || ""
-    ).trim(),
-
-    image: String(
-      raw.IMAGE || ""
-    ).trim(),
-
-    bestSeller: bestSeller,
-
-    newArrival:
-      String(
-        raw.NEW_ARRIVAL || ""
-      )
-      .trim()
-      .toUpperCase() === "YES",
-
-    active: active
-
-  };
-
-}
-
-
-/* =====================================================
-   RENDER HOME PRODUCTS
-===================================================== */
 
 function renderHomeProducts(){
 
@@ -944,277 +934,96 @@ function renderHomeProducts(){
 
   productsContainer.innerHTML = "";
 
-
-  const activeProducts =
-    products.filter(
-      function(product){
-        return product.active;
-      }
-    );
-
-
-  if(activeProducts.length === 0){
-    return;
-  }
-
-
-  /*
-    Home par maximum 8 products
-    show honge.
-  */
-
-  activeProducts
+  HOME_PRODUCTS
+    .filter(function(product){
+      return product.active;
+    })
     .slice(0, 8)
-    .forEach(
-      function(product, index){
+    .forEach(function(product, index){
 
-        const card =
-          document.createElement("article");
+      const card =
+        document.createElement("article");
 
-        card.className =
-          "product-card";
+      card.className = "product-card";
 
+      const tag =
+        product.bestSeller
+          ? "Best Seller"
+          : product.newArrival
+            ? "New In"
+            : "";
 
-        const tag =
-          product.bestSeller
-            ? "best seller"
-            : product.newArrival
-              ? "new in"
-              : "";
+      card.innerHTML = `
 
+        <div class="product-image-wrap">
 
-        card.innerHTML = `
+          <img
+            class="product-image"
+            src="${product.image}"
+            alt="${product.name}"
+            ${index < 4
+              ? 'loading="eager" fetchpriority="high"'
+              : 'loading="lazy"'}
+          >
 
-          <div class="product-image-wrap">
+          ${tag
+            ? `<span class="product-tag">${tag}</span>`
+            : ""}
 
-            <img
-              class="product-image"
-              src="${product.image}"
-              alt="${product.name}"
-              ${index < 4
-                ? 'loading="eager" fetchpriority="high"'
-                : 'loading="lazy"'}
-            >
+        </div>
 
-            ${
-              tag
-                ? `<span class="tag">${tag}</span>`
-                : ""
-            }
+        <div class="product-info">
+
+          <h3>${product.name}</h3>
+
+          <p class="product-description">
+            ${product.description}
+          </p>
+
+          <div class="product-bottom">
+
+            <span class="product-price">
+              ${product.price}
+            </span>
 
             <button
               type="button"
-              class="add-button"
+              class="add-to-bag"
               aria-label="Add ${product.name} to bag"
             >
-              ♧
+              +
             </button>
 
           </div>
 
+        </div>
 
-          <div class="product-info">
+      `;
 
-            <div>
+      const addButton =
+        card.querySelector(".add-to-bag");
 
-              <h3>
-                ${product.name}
-              </h3>
-
-              <p>
-                ${product.price}
-              </p>
-
-            </div>
-
-
-            <button
-              type="button"
-              class="heart"
-              aria-label="Save ${product.name}"
-            >
-              ♡
-            </button>
-
-          </div>
-
-        `;
-
-
-        const addButton =
-          card.querySelector(
-            ".add-button"
-          );
-
-
-        if(addButton){
-
-          addButton.addEventListener(
-            "click",
-            function(event){
-
-              event.preventDefault();
-              event.stopPropagation();
-
-              addToCart(product);
-
-            }
-          );
-
-        }
-
-
-        productsContainer.appendChild(
-          card
-        );
-
-      }
-    );
-
-}
-
-
-/* =====================================================
-   LOAD PRODUCTS FROM GOOGLE SHEET
-===================================================== */
-
-async function loadProductsFromSheet(){
-
-  /*
-    STEP 1:
-    Cache se turant products dikhao.
-  */
-
-  const cached =
-    getProductsCache();
-
-
-  if(cached && cached.length){
-
-    products =
-      cached.map(
-        normalizeProduct
-      );
-
-
-    renderHomeProducts();
-
-  }
-
-
-  /*
-    STEP 2:
-    Google Sheet se latest data
-    background mein fetch karo.
-  */
-
-  try{
-
-    const response =
-      await fetch(
-        PRODUCTS_API_URL,
-        {
-          method: "GET",
-          cache: "no-store"
-        }
-      );
-
-
-    if(!response.ok){
-
-      throw new Error(
-        "Products request failed"
-      );
-
-    }
-
-
-    const data =
-      await response.json();
-
-
-    if(!Array.isArray(data)){
-
-      throw new Error(
-        "Invalid products data"
-      );
-
-    }
-
-
-    const freshProducts =
-      data
-        .map(normalizeProduct)
-        .filter(
-          function(product){
-
-            return (
-              product.active &&
-              product.name
-            );
-
+      if(addButton){
+        addButton.addEventListener(
+          "click",
+          function(event){
+            event.preventDefault();
+            event.stopPropagation();
+            addToCart(product);
           }
         );
+      }
 
+      productsContainer.appendChild(card);
 
-    /*
-      Latest Sheet data save
-      karke next visit instant
-      kar denge.
-    */
-
-    products =
-      freshProducts;
-
-
-    saveProductsCache(
-      freshProducts
-    );
-
-
-    /*
-      Fresh data aane ke baad
-      screen silently update.
-    */
-
-    renderHomeProducts();
-
-
-  }catch(error){
-
-    console.warn(
-      "Google Sheet products could not load:",
-      error
-    );
-
-
-    /*
-      Agar internet/API fail ho gaya
-      toh cached products already
-      screen par rahenge.
-    */
-
-  }
+    });
 
 }
 
 
-/* =====================================================
-   START PRODUCT LOADING
-===================================================== */
+/* Home should never wait for Google Sheet. */
+renderHomeProducts();
 
-function startProductLoading(){
-
-  loadProductsFromSheet();
-
-}
-
-
-/* =====================================================
-   START
-===================================================== */
-
-startProductLoading();
 
 /* =====================================================
    INSTAGRAM
