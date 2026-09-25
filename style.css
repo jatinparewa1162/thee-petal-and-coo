@@ -1129,3 +1129,118 @@ footer{
   }
 
 }
+
+/* =========================
+   REVIEWS — PREMIUM STYLE
+========================= */
+
+.reviews{
+  padding-top:90px;
+  padding-bottom:100px;
+}
+
+.reviews .section-heading{
+  margin-bottom:38px;
+}
+
+.review-grid{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:22px;
+}
+
+.review-grid article{
+  position:relative;
+  background:#fffaf5;
+  border:1px solid rgba(111,58,45,.12);
+  border-radius:24px;
+  padding:30px 28px 27px;
+  min-height:205px;
+
+  display:flex;
+  flex-direction:column;
+  justify-content:space-between;
+
+  box-shadow:0 10px 30px rgba(79,42,31,.06);
+  transition:transform .25s ease, box-shadow .25s ease;
+}
+
+.review-grid article:hover{
+  transform:translateY(-5px);
+  box-shadow:0 16px 35px rgba(79,42,31,.10);
+}
+
+.stars{
+  font-size:15px;
+  letter-spacing:3px;
+  margin-bottom:18px;
+}
+
+.review-grid article p{
+  margin:0;
+  color:#4d3932;
+  font-size:16px;
+  line-height:1.7;
+}
+
+.review-grid article small{
+  display:block;
+  margin-top:24px;
+  padding-top:17px;
+  border-top:1px solid rgba(111,58,45,.10);
+
+  color:#876b60;
+  font-size:12px;
+  letter-spacing:.4px;
+}
+
+/* little decorative heart */
+.review-grid article::after{
+  content:"♡";
+  position:absolute;
+  right:22px;
+  top:18px;
+  font-size:25px;
+  opacity:.18;
+}
+
+
+/* MOBILE */
+
+@media(max-width:800px){
+
+  .reviews{
+    padding-top:65px;
+    padding-bottom:70px;
+  }
+
+  .reviews .section-heading{
+    margin-bottom:28px;
+  }
+
+  .reviews .section-heading > a{
+    display:none;
+  }
+
+  .review-grid{
+    grid-template-columns:1fr;
+    gap:14px;
+  }
+
+  .review-grid article{
+    min-height:auto;
+    padding:25px 22px;
+    border-radius:20px;
+  }
+
+  .review-grid article p{
+    font-size:15px;
+    line-height:1.65;
+  }
+
+  .review-grid article small{
+    margin-top:20px;
+    padding-top:14px;
+  }
+
+}
