@@ -1,12 +1,12 @@
 /* =========================================================
    THEE PETAL AND CO.
-   FULL WEBSITE JAVASCRIPT
+   COMPLETE WEBSITE JAVASCRIPT
 ========================================================= */
 
 
-/* =========================
+/* =========================================================
    PRODUCTS
-========================= */
+========================================================= */
 
 const products = [
   {
@@ -16,6 +16,7 @@ const products = [
     tag: 'best seller',
     image: 'https://images.unsplash.com/photo-1523438885200-e635ba2c371e?auto=format&fit=crop&w=900&q=85'
   },
+
   {
     name: 'Strawberry Fields',
     price: '₹699',
@@ -23,6 +24,7 @@ const products = [
     tag: 'new in',
     image: 'https://images.unsplash.com/photo-1490750967868-88aa4486c946?auto=format&fit=crop&w=900&q=85'
   },
+
   {
     name: 'Sunshine, Always',
     price: '₹799',
@@ -30,6 +32,7 @@ const products = [
     tag: '',
     image: 'https://images.unsplash.com/photo-1527061011665-3652c757a4d4?auto=format&fit=crop&w=900&q=85'
   },
+
   {
     name: 'A Little Something',
     price: '₹499',
@@ -40,66 +43,83 @@ const products = [
 ];
 
 
-/* =========================
+/* =========================================================
    INSTAGRAM
-========================= */
+========================================================= */
 
 const instagramImages = [
   'https://images.unsplash.com/photo-1490750967868-88aa4486c946?auto=format&fit=crop&w=500&q=80',
+
   'https://images.unsplash.com/photo-1523438885200-e635ba2c371e?auto=format&fit=crop&w=500&q=80',
+
   'https://images.unsplash.com/photo-1527061011665-3652c757a4d4?auto=format&fit=crop&w=500&q=80',
+
   'https://images.unsplash.com/photo-1455582916367-25f75bfc6710?auto=format&fit=crop&w=500&q=80',
+
   'https://images.unsplash.com/photo-1526047932273-341f2a7631f9?auto=format&fit=crop&w=500&q=80',
+
   'https://images.unsplash.com/photo-1468327768560-75b778cbb551?auto=format&fit=crop&w=500&q=80'
 ];
 
 
-/* =========================
+/* =========================================================
    CART
-========================= */
+========================================================= */
 
 let cart = [];
 
 
-/* =========================
-   HELPER
-========================= */
+/* =========================================================
+   PRICE FORMAT
+========================================================= */
 
 function formatPrice(amount) {
-  return '₹' + amount.toLocaleString('en-IN');
+
+  return '₹' + Number(amount).toLocaleString('en-IN');
+
 }
 
 
-/* =========================
+/* =========================================================
    CART ELEMENTS
-========================= */
+========================================================= */
 
-const bagButton = document.querySelector('#bag-button');
-const cartCountElement = document.querySelector('#cart-count');
+const bagButton =
+  document.querySelector('#bag-button');
+
+const cartCountElement =
+  document.querySelector('#cart-count');
+
 
 const cartDrawer =
   document.querySelector('#cart-drawer') ||
   document.querySelector('.cart-drawer');
 
+
 const cartBackdrop =
   document.querySelector('#cart-backdrop') ||
   document.querySelector('.cart-backdrop');
+
 
 const cartItems =
   document.querySelector('#cart-items') ||
   document.querySelector('.cart-items');
 
+
 const cartEmpty =
   document.querySelector('#cart-empty') ||
   document.querySelector('.cart-empty');
+
 
 const cartTotal =
   document.querySelector('#cart-total') ||
   document.querySelector('.cart-total');
 
+
 const cartClose =
   document.querySelector('#cart-close') ||
   document.querySelector('.cart-close');
+
 
 const customiseButton =
   document.querySelector('#customise-order') ||
@@ -108,37 +128,43 @@ const customiseButton =
   document.querySelector('.customise-order');
 
 
-/* =========================
+/* =========================================================
    UPDATE CART COUNT
-========================= */
+========================================================= */
 
 function updateCartCount() {
 
-  const totalItems = cart.reduce(
-    (sum, item) => sum + item.quantity,
-    0
-  );
+  const totalItems =
+    cart.reduce(
+      (sum, item) => sum + item.quantity,
+      0
+    );
+
 
   if (cartCountElement) {
 
-    cartCountElement.textContent = totalItems;
+    cartCountElement.textContent =
+      totalItems;
 
-    cartCountElement.hidden = totalItems === 0;
+    cartCountElement.hidden =
+      totalItems === 0;
 
   }
 
 }
 
 
-/* =========================
+/* =========================================================
    ADD TO CART
-========================= */
+========================================================= */
 
 function addToCart(product) {
 
-  const existing = cart.find(
-    item => item.name === product.name
-  );
+  const existing =
+    cart.find(
+      item => item.name === product.name
+    );
+
 
   if (existing) {
 
@@ -153,119 +179,176 @@ function addToCart(product) {
 
   }
 
+
   updateCartCount();
+
   renderCart();
 
 }
 
 
-/* =========================
+/* =========================================================
    REMOVE FROM CART
-========================= */
+========================================================= */
 
 function removeFromCart(productName) {
 
-  cart = cart.filter(
-    item => item.name !== productName
-  );
+  cart =
+    cart.filter(
+      item => item.name !== productName
+    );
+
 
   updateCartCount();
+
   renderCart();
 
 }
 
 
-/* =========================
+/* =========================================================
    CHANGE QUANTITY
-========================= */
+========================================================= */
 
-function changeQuantity(productName, change) {
+function changeQuantity(
+  productName,
+  change
+) {
 
-  const item = cart.find(
-    product => product.name === productName
-  );
+  const item =
+    cart.find(
+      product =>
+        product.name === productName
+    );
+
 
   if (!item) return;
 
+
   item.quantity += change;
+
 
   if (item.quantity <= 0) {
 
     removeFromCart(productName);
+
     return;
 
   }
 
+
   updateCartCount();
+
   renderCart();
 
 }
 
 
-/* =========================
+/* =========================================================
    CART TOTAL
-========================= */
+========================================================= */
 
 function getCartTotal() {
 
   return cart.reduce(
     (total, item) =>
-      total + (item.priceNumber * item.quantity),
+      total +
+      (
+        item.priceNumber *
+        item.quantity
+      ),
     0
   );
 
 }
 
 
-/* =========================
+/* =========================================================
    RENDER CART
-========================= */
+========================================================= */
 
 function renderCart() {
 
   if (!cartItems) return;
 
+
   cartItems.innerHTML = '';
+
+
+  /*
+    EMPTY CART
+  */
 
   if (cart.length === 0) {
 
     if (cartEmpty) {
+
       cartEmpty.hidden = false;
+
     }
 
+
     if (cartTotal) {
-      cartTotal.textContent = '₹0';
+
+      cartTotal.textContent =
+        '₹0';
+
     }
+
 
     return;
 
   }
 
 
+  /*
+    HIDE EMPTY MESSAGE
+  */
+
   if (cartEmpty) {
+
     cartEmpty.hidden = true;
+
   }
 
 
+  /*
+    SHOW CART PRODUCTS
+  */
+
   cart.forEach(item => {
 
-    const cartItem = document.createElement('div');
+    const cartItem =
+      document.createElement('div');
 
-    cartItem.className = 'cart-item';
+
+    cartItem.className =
+      'cart-item';
+
 
     cartItem.innerHTML = `
+
       <div class="cart-item-image">
+
         <img
           src="${item.image}"
           alt="${item.name}"
         >
+
       </div>
+
 
       <div class="cart-item-info">
 
-        <h4>${item.name}</h4>
+        <h4>
+          ${item.name}
+        </h4>
 
-        <p>${formatPrice(item.priceNumber)}</p>
+
+        <p>
+          ${formatPrice(item.priceNumber)}
+        </p>
+
 
         <div class="cart-quantity">
 
@@ -277,7 +360,11 @@ function renderCart() {
             −
           </button>
 
-          <span>${item.quantity}</span>
+
+          <span>
+            ${item.quantity}
+          </span>
+
 
           <button
             type="button"
@@ -289,6 +376,7 @@ function renderCart() {
 
         </div>
 
+
         <button
           type="button"
           class="remove-cart-item"
@@ -297,119 +385,202 @@ function renderCart() {
         </button>
 
       </div>
+
     `;
 
 
-    cartItem
-      .querySelector('.qty-minus')
-      .addEventListener('click', () => {
+    /*
+      MINUS
+    */
 
-        changeQuantity(item.name, -1);
-
-      });
-
-
-    cartItem
-      .querySelector('.qty-plus')
-      .addEventListener('click', () => {
-
-        changeQuantity(item.name, 1);
-
-      });
+    const minusButton =
+      cartItem.querySelector(
+        '.qty-minus'
+      );
 
 
-    cartItem
-      .querySelector('.remove-cart-item')
-      .addEventListener('click', () => {
+    if (minusButton) {
 
-        removeFromCart(item.name);
+      minusButton.addEventListener(
+        'click',
+        () => {
 
-      });
+          changeQuantity(
+            item.name,
+            -1
+          );
+
+        }
+      );
+
+    }
 
 
-    cartItems.appendChild(cartItem);
+    /*
+      PLUS
+    */
+
+    const plusButton =
+      cartItem.querySelector(
+        '.qty-plus'
+      );
+
+
+    if (plusButton) {
+
+      plusButton.addEventListener(
+        'click',
+        () => {
+
+          changeQuantity(
+            item.name,
+            1
+          );
+
+        }
+      );
+
+    }
+
+
+    /*
+      REMOVE
+    */
+
+    const removeButton =
+      cartItem.querySelector(
+        '.remove-cart-item'
+      );
+
+
+    if (removeButton) {
+
+      removeButton.addEventListener(
+        'click',
+        () => {
+
+          removeFromCart(
+            item.name
+          );
+
+        }
+      );
+
+    }
+
+
+    cartItems.appendChild(
+      cartItem
+    );
 
   });
 
 
+  /*
+    TOTAL
+  */
+
   if (cartTotal) {
 
     cartTotal.textContent =
-      formatPrice(getCartTotal());
+      formatPrice(
+        getCartTotal()
+      );
 
   }
 
 }
 
 
-/* =========================
+/* =========================================================
    OPEN CART
-========================= */
+========================================================= */
 
 function openCart() {
 
   if (cartDrawer) {
 
-    cartDrawer.classList.add('open');
+    cartDrawer.classList.add(
+      'open'
+    );
 
   }
 
+
   if (cartBackdrop) {
 
-    cartBackdrop.classList.add('open');
+    cartBackdrop.classList.add(
+      'open'
+    );
 
   }
 
 }
 
 
-/* =========================
+/* =========================================================
    CLOSE CART
-========================= */
+========================================================= */
 
 function closeCart() {
 
   if (cartDrawer) {
 
-    cartDrawer.classList.remove('open');
+    cartDrawer.classList.remove(
+      'open'
+    );
 
   }
+
 
   if (cartBackdrop) {
 
-    cartBackdrop.classList.remove('open');
+    cartBackdrop.classList.remove(
+      'open'
+    );
 
   }
 
 }
 
 
-/* =========================
+/* =========================================================
    BAG BUTTON
-========================= */
+========================================================= */
 
 if (bagButton) {
 
-  bagButton.addEventListener('click', () => {
+  bagButton.addEventListener(
+    'click',
+    () => {
 
-    renderCart();
-    openCart();
+      renderCart();
 
-  });
+      openCart();
+
+    }
+  );
 
 }
 
 
-/* =========================
-   CLOSE BUTTON
-========================= */
+/* =========================================================
+   CART CLOSE BUTTON
+========================================================= */
 
 if (cartClose) {
 
-  cartClose.addEventListener('click', closeCart);
+  cartClose.addEventListener(
+    'click',
+    closeCart
+  );
 
 }
 
+
+/* =========================================================
+   CART BACKDROP
+========================================================= */
 
 if (cartBackdrop) {
 
@@ -421,186 +592,422 @@ if (cartBackdrop) {
 }
 
 
-/* =========================
+/* =========================================================
    CUSTOMISE / ORDER
-========================= */
+========================================================= */
 
 if (customiseButton) {
 
-  customiseButton.addEventListener('click', () => {
+  customiseButton.addEventListener(
+    'click',
+    () => {
 
-    /*
-      If cart is empty,
-      simply go to custom order section.
-    */
+      /*
+        EMPTY CART
+      */
 
-    if (cart.length === 0) {
+      if (cart.length === 0) {
 
-      closeCart();
-
-      const customSection =
-        document.querySelector('#custom');
-
-      if (customSection) {
-
-        customSection.scrollIntoView({
-          behavior: 'smooth'
-        });
-
-      }
-
-      return;
-
-    }
+        closeCart();
 
 
-    /*
-      Create selected product text.
-    */
-
-    const selectedProducts = cart
-      .map(item =>
-        `${item.name} × ${item.quantity}`
-      )
-      .join(', ');
-
-
-    const total = getCartTotal();
-
-
-    /*
-      Product dropdown.
-    */
-
-    const productField =
-      document.querySelector('#product');
-
-
-    /*
-      Message field.
-    */
-
-    const messageField =
-      document.querySelector('#message');
-
-
-    /*
-      Try to select product automatically
-      if dropdown has matching option.
-    */
-
-    if (productField) {
-
-      const matchingOption =
-        [...productField.options].find(
-          option =>
-            option.textContent
-              .trim()
-              .toLowerCase() ===
-            cart[0].name
-              .trim()
-              .toLowerCase()
-        );
-
-
-      if (matchingOption) {
-
-        productField.value =
-          matchingOption.value;
-
-      } else {
-
-        /*
-          If multiple/custom products,
-          select Custom if available.
-        */
-
-        const customOption =
-          [...productField.options].find(
-            option =>
-              option.textContent
-                .toLowerCase()
-                .includes('custom')
+        const customSection =
+          document.querySelector(
+            '#custom'
           );
 
 
-        if (customOption) {
+        if (customSection) {
+
+          customSection.scrollIntoView({
+            behavior: 'smooth'
+          });
+
+        }
+
+
+        return;
+
+      }
+
+
+      /*
+        SELECTED PRODUCTS
+      */
+
+      const selectedProducts =
+        cart
+          .map(
+            item =>
+              `${item.name} × ${item.quantity}`
+          )
+          .join(', ');
+
+
+      /*
+        TOTAL
+      */
+
+      const total =
+        getCartTotal();
+
+
+      const totalText =
+        formatPrice(total);
+
+
+      /* =====================================================
+         PRODUCT FIELD
+      ===================================================== */
+
+      const productField =
+        document.querySelector(
+          '#product'
+        );
+
+
+      if (productField) {
+
+        /*
+          SELECT DROPDOWN
+        */
+
+        if (
+          productField.tagName ===
+          'SELECT'
+        ) {
+
+          /*
+            Remove previous automatic option
+          */
+
+          const oldOption =
+            productField.querySelector(
+              'option[data-cart-order="true"]'
+            );
+
+
+          if (oldOption) {
+
+            oldOption.remove();
+
+          }
+
+
+          /*
+            Create new option
+          */
+
+          const newOption =
+            document.createElement(
+              'option'
+            );
+
+
+          newOption.value =
+            selectedProducts;
+
+
+          newOption.textContent =
+            selectedProducts;
+
+
+          newOption.dataset.cartOrder =
+            'true';
+
+
+          newOption.selected =
+            true;
+
+
+          /*
+            Put at top
+          */
+
+          productField.insertBefore(
+            newOption,
+            productField.firstChild
+          );
+
+
+          /*
+            Force value
+          */
 
           productField.value =
-            customOption.value;
+            selectedProducts;
+
+
+          /*
+            Trigger change
+          */
+
+          productField.dispatchEvent(
+            new Event(
+              'change',
+              {
+                bubbles: true
+              }
+            )
+          );
+
+        }
+
+
+        /*
+          INPUT / TEXT FIELD
+        */
+
+        else {
+
+          productField.value =
+            selectedProducts;
+
+
+          productField.dispatchEvent(
+            new Event(
+              'input',
+              {
+                bubbles: true
+              }
+            )
+          );
 
         }
 
       }
 
-    }
+
+      /* =====================================================
+         BUDGET FIELD
+      ===================================================== */
+
+      const budgetField =
+        document.querySelector(
+          '#budget'
+        );
 
 
-    /*
-      Add cart details into message.
-    */
+      if (budgetField) {
 
-    if (messageField) {
+        /*
+          SELECT DROPDOWN
+        */
 
-      const cartMessage =
-        `Selected items: ${selectedProducts}\n` +
-        `Estimated total: ${formatPrice(total)}\n\n`;
+        if (
+          budgetField.tagName ===
+          'SELECT'
+        ) {
 
-      /*
-        Don't destroy anything already typed.
-      */
+          /*
+            Remove old automatic budget
+          */
 
-      if (
-        !messageField.value
-          .includes('Selected items:')
-      ) {
+          const oldBudget =
+            budgetField.querySelector(
+              'option[data-cart-budget="true"]'
+            );
 
-        messageField.value =
-          cartMessage + messageField.value;
+
+          if (oldBudget) {
+
+            oldBudget.remove();
+
+          }
+
+
+          /*
+            Create automatic budget option
+          */
+
+          const budgetOption =
+            document.createElement(
+              'option'
+            );
+
+
+          budgetOption.value =
+            totalText;
+
+
+          budgetOption.textContent =
+            `Selected Products Total: ${totalText}`;
+
+
+          budgetOption.dataset.cartBudget =
+            'true';
+
+
+          budgetOption.selected =
+            true;
+
+
+          budgetField.insertBefore(
+            budgetOption,
+            budgetField.firstChild
+          );
+
+
+          /*
+            Force value
+          */
+
+          budgetField.value =
+            totalText;
+
+
+          /*
+            Trigger change
+          */
+
+          budgetField.dispatchEvent(
+            new Event(
+              'change',
+              {
+                bubbles: true
+              }
+            )
+          );
+
+        }
+
+
+        /*
+          INPUT / TEXT FIELD
+        */
+
+        else {
+
+          budgetField.value =
+            totalText;
+
+
+          budgetField.dispatchEvent(
+            new Event(
+              'input',
+              {
+                bubbles: true
+              }
+            )
+          );
+
+        }
+
+      }
+
+
+      /* =====================================================
+         MESSAGE FIELD
+      ===================================================== */
+
+      const messageField =
+        document.querySelector(
+          '#message'
+        );
+
+
+      if (messageField) {
+
+        const cartDetails =
+          `Selected Products: ${selectedProducts}
+Estimated Total: ${totalText}`;
+
+
+        /*
+          Only add once
+        */
+
+        if (
+          !messageField.value.includes(
+            'Selected Products:'
+          )
+        ) {
+
+          messageField.value =
+            cartDetails +
+            '\n\n' +
+            messageField.value;
+
+        }
+
+
+        messageField.dispatchEvent(
+          new Event(
+            'input',
+            {
+              bubbles: true
+            }
+          )
+        );
+
+      }
+
+
+      /* =====================================================
+         CLOSE CART
+      ===================================================== */
+
+      closeCart();
+
+
+      /* =====================================================
+         OPEN CUSTOM ORDER SECTION
+      ===================================================== */
+
+      const customSection =
+        document.querySelector(
+          '#custom'
+        );
+
+
+      if (customSection) {
+
+        setTimeout(
+          () => {
+
+            customSection.scrollIntoView({
+              behavior: 'smooth',
+              block: 'start'
+            });
+
+
+            /*
+              Focus product field
+            */
+
+            if (productField) {
+
+              setTimeout(
+                () => {
+
+                  productField.focus();
+
+                },
+                500
+              );
+
+            }
+
+          },
+          200
+        );
 
       }
 
     }
-
-
-    /*
-      Close cart.
-    */
-
-    closeCart();
-
-
-    /*
-      Go to custom order form.
-    */
-
-    const customSection =
-      document.querySelector('#custom');
-
-    if (customSection) {
-
-      setTimeout(() => {
-
-        customSection.scrollIntoView({
-          behavior: 'smooth',
-          block: 'start'
-        });
-
-      }, 200);
-
-    }
-
-  });
+  );
 
 }
 
 
-/* =========================
-   PRODUCTS
-========================= */
+/* =========================================================
+   PRODUCT CARDS
+========================================================= */
 
 const productRoot =
-  document.querySelector('#products');
+  document.querySelector(
+    '#products'
+  );
 
 
 if (productRoot) {
@@ -608,109 +1015,158 @@ if (productRoot) {
   productRoot.innerHTML = '';
 
 
-  products.forEach((product) => {
+  products.forEach(
+    product => {
 
-    const card =
-      document.createElement('article');
-
-
-    card.className =
-      'product-card';
-
-
-    card.innerHTML = `
-      <div class="product-image">
-
-        <img
-          src="${product.image}"
-          alt="${product.name}"
-          loading="lazy"
-        >
-
-        ${
-          product.tag
-            ? `<span class="tag">${product.tag}</span>`
-            : ''
-        }
-
-        <button
-          class="add-button"
-          aria-label="Add ${product.name} to bag"
-          type="button"
-        >
-          ♧
-        </button>
-
-      </div>
+      const card =
+        document.createElement(
+          'article'
+        );
 
 
-      <div class="product-info">
+      card.className =
+        'product-card';
 
-        <div>
 
-          <h3>${product.name}</h3>
+      card.innerHTML = `
 
-          <p>${product.price}</p>
+        <div class="product-image">
+
+          <img
+            src="${product.image}"
+            alt="${product.name}"
+            loading="lazy"
+          >
+
+
+          ${
+            product.tag
+              ? `
+                <span class="tag">
+                  ${product.tag}
+                </span>
+              `
+              : ''
+          }
+
+
+          <button
+            class="add-button"
+            type="button"
+            aria-label="Add ${product.name} to bag"
+          >
+            ♧
+          </button>
 
         </div>
 
 
-        <button
-          class="heart"
-          aria-label="Save ${product.name}"
-          type="button"
-        >
-          ♡
-        </button>
+        <div class="product-info">
 
-      </div>
-    `;
+          <div>
 
+            <h3>
+              ${product.name}
+            </h3>
 
-    /*
-      Add to Bag.
-    */
+            <p>
+              ${product.price}
+            </p>
 
-    card
-      .querySelector('.add-button')
-      .addEventListener('click', () => {
-
-        addToCart(product);
-
-      });
+          </div>
 
 
-    /*
-      Wishlist heart.
-    */
+          <button
+            class="heart"
+            type="button"
+            aria-label="Save ${product.name}"
+          >
+            ♡
+          </button>
 
-    card
-      .querySelector('.heart')
-      .addEventListener('click', function () {
+        </div>
 
-        this.classList.toggle('saved');
-
-        this.textContent =
-          this.classList.contains('saved')
-            ? '♥'
-            : '♡';
-
-      });
+      `;
 
 
-    productRoot.appendChild(card);
+      /*
+        ADD TO BAG
+      */
 
-  });
+      const addButton =
+        card.querySelector(
+          '.add-button'
+        );
+
+
+      if (addButton) {
+
+        addButton.addEventListener(
+          'click',
+          () => {
+
+            addToCart(
+              product
+            );
+
+          }
+        );
+
+      }
+
+
+      /*
+        HEART
+      */
+
+      const heartButton =
+        card.querySelector(
+          '.heart'
+        );
+
+
+      if (heartButton) {
+
+        heartButton.addEventListener(
+          'click',
+          function () {
+
+            this.classList.toggle(
+              'saved'
+            );
+
+
+            this.textContent =
+              this.classList.contains(
+                'saved'
+              )
+                ? '♥'
+                : '♡';
+
+          }
+        );
+
+      }
+
+
+      productRoot.appendChild(
+        card
+      );
+
+    }
+  );
 
 }
 
 
-/* =========================
-   INSTAGRAM
-========================= */
+/* =========================================================
+   INSTAGRAM GRID
+========================================================= */
 
 const instaRoot =
-  document.querySelector('#instagram-grid');
+  document.querySelector(
+    '#instagram-grid'
+  );
 
 
 if (instaRoot) {
@@ -718,52 +1174,71 @@ if (instaRoot) {
   instaRoot.innerHTML = '';
 
 
-  instagramImages.forEach((src, index) => {
+  instagramImages.forEach(
+    (src, index) => {
 
-    const link =
-      document.createElement('a');
-
-
-    link.href =
-      'https://instagram.com/thhepetalandco';
-
-    link.target =
-      '_blank';
-
-    link.rel =
-      'noreferrer';
+      const link =
+        document.createElement(
+          'a'
+        );
 
 
-    link.innerHTML = `
-      <img
-        src="${src}"
-        alt="Instagram post ${index + 1}"
-        loading="lazy"
-      >
-    `;
+      link.href =
+        'https://instagram.com/thhepetalandco';
 
 
-    instaRoot.appendChild(link);
+      link.target =
+        '_blank';
 
-  });
+
+      link.rel =
+        'noreferrer';
+
+
+      link.innerHTML = `
+
+        <img
+          src="${src}"
+          alt="Instagram post ${index + 1}"
+          loading="lazy"
+        >
+
+      `;
+
+
+      instaRoot.appendChild(
+        link
+      );
+
+    }
+  );
 
 }
 
 
-/* =========================
+/* =========================================================
    MOBILE MENU
-========================= */
+========================================================= */
 
 const drawer =
-  document.querySelector('#mobile-drawer');
+  document.querySelector(
+    '#mobile-drawer'
+  );
+
 
 const backdrop =
-  document.querySelector('#drawer-backdrop');
+  document.querySelector(
+    '#drawer-backdrop'
+  );
 
 
 function toggleMenu(open) {
 
-  if (!drawer || !backdrop) return;
+  if (!drawer || !backdrop) {
+
+    return;
+
+  }
 
 
   drawer.classList.toggle(
@@ -786,297 +1261,62 @@ function toggleMenu(open) {
 }
 
 
+/*
+  OPEN
+*/
+
 const menuOpen =
-  document.querySelector('#menu-open');
-
-
-const menuClose =
-  document.querySelector('#menu-close');
+  document.querySelector(
+    '#menu-open'
+  );
 
 
 if (menuOpen) {
 
   menuOpen.addEventListener(
     'click',
-    () => toggleMenu(true)
+    () => {
+
+      toggleMenu(true);
+
+    }
   );
 
 }
+
+
+/*
+  CLOSE
+*/
+
+const menuClose =
+  document.querySelector(
+    '#menu-close'
+  );
 
 
 if (menuClose) {
 
   menuClose.addEventListener(
     'click',
-    () => toggleMenu(false)
+    () => {
+
+      toggleMenu(false);
+
+    }
   );
 
 }
 
+
+/*
+  BACKDROP
+*/
 
 if (backdrop) {
 
   backdrop.addEventListener(
     'click',
-    () => toggleMenu(false)
-  );
+    () => {
 
-}
-
-
-if (drawer) {
-
-  drawer
-    .querySelectorAll('a')
-    .forEach(link => {
-
-      link.addEventListener(
-        'click',
-        () => toggleMenu(false)
-      );
-
-    });
-
-}
-
-
-/* =========================
-   CUSTOM ORDER FORM
-   GOOGLE SHEET + DRIVE
-========================= */
-
-const customForm =
-  document.querySelector('#custom-form');
-
-const successMessage =
-  document.querySelector('#form-success');
-
-const photoInput =
-  document.querySelector('#photo');
-
-const photoData =
-  document.querySelector('#photoData');
-
-const photoName =
-  document.querySelector('#photoName');
-
-const photoMimeType =
-  document.querySelector('#photoMimeType');
-
-
-if (customForm) {
-
-  customForm.addEventListener(
-    'submit',
-    function (event) {
-
-      event.preventDefault();
-
-
-      const file =
-        photoInput &&
-        photoInput.files[0];
-
-
-      /*
-        NO PHOTO
-      */
-
-      if (!file) {
-
-        customForm.submit();
-
-
-        setTimeout(() => {
-
-          if (successMessage) {
-            successMessage.hidden = false;
-          }
-
-          customForm.reset();
-
-          /*
-            Cart clear after order request.
-          */
-
-          cart = [];
-
-          updateCartCount();
-          renderCart();
-
-        }, 1500);
-
-
-        return;
-
-      }
-
-
-      /*
-        PHOTO COMPRESSION
-      */
-
-      const reader =
-        new FileReader();
-
-
-      reader.onload =
-        function () {
-
-          const img =
-            new Image();
-
-
-          img.onload =
-            function () {
-
-              const canvas =
-                document.createElement('canvas');
-
-
-              const maxWidth = 1200;
-              const maxHeight = 1200;
-
-
-              let width =
-                img.width;
-
-              let height =
-                img.height;
-
-
-              if (width > maxWidth) {
-
-                height =
-                  height *
-                  (maxWidth / width);
-
-                width =
-                  maxWidth;
-
-              }
-
-
-              if (height > maxHeight) {
-
-                width =
-                  width *
-                  (maxHeight / height);
-
-                height =
-                  maxHeight;
-
-              }
-
-
-              canvas.width =
-                width;
-
-              canvas.height =
-                height;
-
-
-              const ctx =
-                canvas.getContext('2d');
-
-
-              ctx.drawImage(
-                img,
-                0,
-                0,
-                width,
-                height
-              );
-
-
-              const compressedData =
-                canvas.toDataURL(
-                  'image/jpeg',
-                  0.75
-                );
-
-
-              if (photoData) {
-
-                photoData.value =
-                  compressedData;
-
-              }
-
-
-              if (photoName) {
-
-                photoName.value =
-                  file.name
-                    .replace(/\.[^/.]+$/, '') +
-                  '.jpg';
-
-              }
-
-
-              if (photoMimeType) {
-
-                photoMimeType.value =
-                  'image/jpeg';
-
-              }
-
-
-              /*
-                IMPORTANT:
-                Native submit keeps the existing
-                Google Apps Script + hidden iframe
-                system working.
-              */
-
-              customForm.submit();
-
-
-              setTimeout(() => {
-
-                if (successMessage) {
-
-                  successMessage.hidden =
-                    false;
-
-                }
-
-
-                customForm.reset();
-
-
-                /*
-                  Clear cart after order request.
-                */
-
-                cart = [];
-
-                updateCartCount();
-                renderCart();
-
-              }, 1500);
-
-            };
-
-
-          img.src =
-            reader.result;
-
-        };
-
-
-      reader.readAsDataURL(file);
-
-    }
-
-  );
-
-}
-
-
-/* =========================
-   INITIAL STATE
-========================= */
-
-updateCartCount();
-renderCart();
+      toggleMen
