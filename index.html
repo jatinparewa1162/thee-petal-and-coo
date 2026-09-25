@@ -89,6 +89,8 @@
   </header>
 
 
+  <!-- MOBILE MENU -->
+
   <aside
     class="mobile-drawer"
     id="mobile-drawer"
@@ -116,6 +118,92 @@
     class="drawer-backdrop"
     id="drawer-backdrop"
   ></div>
+
+
+  <!-- CART DRAWER -->
+
+  <div
+    class="cart-backdrop"
+    id="cart-backdrop"
+  ></div>
+
+
+  <aside
+    class="cart-drawer"
+    id="cart-drawer"
+  >
+
+    <div class="cart-header">
+
+      <h2>
+        Your Bag
+      </h2>
+
+      <button
+        type="button"
+        class="cart-close"
+        id="cart-close"
+        aria-label="Close bag"
+      >
+        ×
+      </button>
+
+    </div>
+
+
+    <div
+      class="cart-items"
+      id="cart-items"
+    >
+
+      <div
+        class="cart-empty"
+        id="cart-empty"
+      >
+
+        <p>
+          Your bag is empty ♡
+        </p>
+
+        <a
+          href="#shop"
+          class="button outline"
+        >
+          Continue shopping
+        </a>
+
+      </div>
+
+    </div>
+
+
+    <div class="cart-footer">
+
+      <div class="cart-total-row">
+
+        <span>
+          Total
+        </span>
+
+        <strong id="cart-total">
+          ₹0
+        </strong>
+
+      </div>
+
+
+      <button
+        type="button"
+        class="button primary full customise-order"
+        id="customise-order"
+      >
+        Customise / Order
+        <span>→</span>
+      </button>
+
+    </div>
+
+  </aside>
 
 
 
@@ -404,7 +492,7 @@
 
             Product type
 
-            <select name="product">
+            <select name="product" id="product">
 
               <option>Bouquet</option>
               <option>Gift hamper</option>
@@ -422,6 +510,7 @@
 
             <textarea
               name="message"
+              id="message"
               rows="3"
               placeholder="Tell us your idea..."
             ></textarea>
@@ -432,34 +521,36 @@
 
           <label class="full file-label">
 
-  Upload inspiration/photo
+            Upload inspiration/photo
 
-  <input
-    type="file"
-    id="photo"
-    name="photo"
-    accept="image/*"
-  >
+            <input
+              type="file"
+              id="photo"
+              name="photo"
+              accept="image/*"
+            >
 
-  <input
-    type="hidden"
-    id="photoData"
-    name="photoData"
-  >
+            <input
+              type="hidden"
+              id="photoData"
+              name="photoData"
+            >
 
-  <input
-    type="hidden"
-    id="photoName"
-    name="photoName"
-  >
+            <input
+              type="hidden"
+              id="photoName"
+              name="photoName"
+            >
 
-  <input
-    type="hidden"
-    id="photoMimeType"
-    name="photoMimeType"
-  >
+            <input
+              type="hidden"
+              id="photoMimeType"
+              name="photoMimeType"
+            >
 
-</label>
+          </label>
+
+
 
           <button
             class="button primary full"
