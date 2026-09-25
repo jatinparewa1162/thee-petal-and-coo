@@ -775,3 +775,567 @@ if(cartBackdrop){
 
 
 loadProducts();
+
+/* =========================
+   CUSTOMISE / ORDER
+========================= */
+
+if(customiseOrder){
+
+  customiseOrder.addEventListener(
+    "click",
+    () => {
+
+      if(cart.length === 0){
+
+        closeCart();
+
+        alert(
+          "Please add something to your bag first ♡"
+        );
+
+        return;
+
+      }
+
+
+      /*
+       * Save cart temporarily.
+       * Custom order form Home page par hai.
+       */
+
+      const orderData = {
+
+        products: cart.map(item => ({
+
+          id: item.id,
+
+          name: item.name,
+
+          category: item.category,
+
+          quantity: item.quantity,
+
+          price: item.priceNumber
+
+        })),
+
+        total: getCartTotal()
+
+      };
+
+
+      sessionStorage.setItem(
+        "petalCartOrder",
+        JSON.stringify(orderData)
+      );
+
+
+      closeCart();
+
+
+      /*
+       * Open Home page Custom Order section
+       */
+
+      window.location.href =
+        "index.html#custom";
+
+    }
+  );
+
+}
+
+
+/* =========================
+   SEARCH
+========================= */
+
+const searchButton =
+  document.querySelector(
+    ".search-button"
+  );
+
+const searchOverlay =
+  document.querySelector(
+    "#search-overlay"
+  );
+
+const searchClose =
+  document.querySelector(
+    "#search-close"
+  );
+
+const productSearch =
+  document.querySelector(
+    "#product-search"
+  );
+
+const searchClear =
+  document.querySelector(
+    "#search-clear"
+  );
+
+const searchResults =
+  document.querySelector(
+    "#search-results"
+  );
+
+const searchHint =
+  document.querySelector(
+    "#search-hint"
+  );
+
+
+function openSearch(){
+
+  if(!searchOverlay)
+    return;
+
+
+  searchOverlay.classList.add(
+    "open"
+  );
+
+
+  searchOverlay.setAttribute(
+    "aria-hidden",
+    "false"
+  );
+
+
+  document.body.classList.add(
+    "search-open"
+  );
+
+
+  setTimeout(
+    () => {
+
+      if(productSearch)
+        productSearch.focus();
+
+    },
+    150
+  );
+
+}
+
+
+function closeSearch(){
+
+  if(!searchOverlay)
+    return;
+
+
+  searchOverlay.classList.remove(
+    "open"
+  );
+
+
+  searchOverlay.setAttribute(
+    "aria-hidden",
+    "true"
+  );
+
+
+  document.body.classList.remove(
+    "search-open"
+  );
+
+
+  if(productSearch)
+    productSearch.value = "";
+
+
+  if(searchClear)
+    searchClear.hidden = true;
+
+
+  if(searchResults)
+    searchResults.innerHTML = "";
+
+
+  if(searchHint)
+    searchHint.textContent =
+      "Search our blooms";
+
+}
+
+
+function performSearch(){
+
+  if(!productSearch ||
+     !searchResults)
+    return;
+
+
+  const query =
+    productSearch.value
+      .toLowerCase()
+      .trim();
+
+
+  if(searchClear)
+    searchClear.hidden =
+      !query;
+
+
+  searchResults.innerHTML = "";
+
+
+  if(!query){
+
+    if(searchHint)
+      searchHint.textContent =
+        "Search our blooms";
+
+    return;
+
+  }
+
+
+  const matches =
+    products.filter(product => {
+
+      const searchableText = `
+
+        ${product.name}
+
+        ${product.category}
+
+        ${product.description}
+
+      `.toLowerCase();
+
+
+      return searchableText.includes(
+        query
+      );
+
+    });
+
+
+  if(searchHint){
+
+    searchHint.textContent =
+      matches.length
+      ? `${matches.length} ${
+          matches.length === 1
+          ? "bloom"
+          : "blooms"
+        } found`
+      : "Nothing found ♡";
+
+  }
+
+
+  if(matches.length === 0){
+
+    searchResults.innerHTML = `
+
+      <div class="search-no-results">
+
+        <div class="search-no-icon">
+          ♡
+        </div>
+
+        <h3>
+          Nothing found
+        </h3>
+
+        <p>
+          Try another flower, colour or gift.
+        </p>
+
+      </div>
+
+    `;
+
+    return;
+
+  }
+
+
+  matches.forEach(product => {
+
+    const result =
+      document.createElement(
+        "article"
+      );
+
+
+    result.className =
+      "search-result-card";
+
+
+    result.innerHTML = `
+
+      <img
+        src="${product.image}"
+        alt="${product.name}"
+      >
+
+
+      <div class="search-result-info">
+
+        <span>
+          ${product.category}
+        </span>
+
+        <h3>
+          ${product.name}
+        </h3>
+
+        <p>
+          ${product.price}
+        </p>
+
+      </div>
+
+
+      <button
+        type="button"
+        class="search-add-button"
+      >
+        +
+      </button>
+
+    `;
+
+
+    result
+      .querySelector(
+        ".search-add-button"
+      )
+      .addEventListener(
+        "click",
+        event => {
+
+          event.stopPropagation();
+
+          addToCart(product);
+
+          closeSearch();
+
+        }
+      );
+
+
+    searchResults.appendChild(
+      result
+    );
+
+  });
+
+}
+
+
+if(searchButton){
+
+  searchButton.addEventListener(
+    "click",
+    openSearch
+  );
+
+}
+
+
+if(searchClose){
+
+  searchClose.addEventListener(
+    "click",
+    closeSearch
+  );
+
+}
+
+
+if(productSearch){
+
+  productSearch.addEventListener(
+    "input",
+    performSearch
+  );
+
+}
+
+
+if(searchClear){
+
+  searchClear.addEventListener(
+    "click",
+    () => {
+
+      productSearch.value = "";
+
+      productSearch.focus();
+
+      performSearch();
+
+    }
+  );
+
+}
+
+
+if(searchOverlay){
+
+  searchOverlay.addEventListener(
+    "click",
+    event => {
+
+      if(
+        event.target ===
+        searchOverlay
+      ){
+
+        closeSearch();
+
+      }
+
+    }
+  );
+
+}
+
+
+document.addEventListener(
+  "keydown",
+  event => {
+
+    if(
+      event.key === "Escape" &&
+      searchOverlay &&
+      searchOverlay.classList.contains(
+        "open"
+      )
+    ){
+
+      closeSearch();
+
+    }
+
+  }
+);
+
+/* =========================
+   MOBILE MENU
+========================= */
+
+const mobileDrawer =
+  document.querySelector("#mobile-drawer");
+
+const drawerBackdrop =
+  document.querySelector("#drawer-backdrop");
+
+const menuOpen =
+  document.querySelector("#menu-open");
+
+const menuClose =
+  document.querySelector("#menu-close");
+
+
+function toggleMenu(open){
+
+  if(mobileDrawer){
+
+    mobileDrawer.classList.toggle(
+      "open",
+      open
+    );
+
+  }
+
+  if(drawerBackdrop){
+
+    drawerBackdrop.classList.toggle(
+      "open",
+      open
+    );
+
+  }
+
+  document.body.classList.toggle(
+    "menu-open",
+    open
+  );
+
+}
+
+
+if(menuOpen){
+
+  menuOpen.addEventListener(
+    "click",
+    () => toggleMenu(true)
+  );
+
+}
+
+
+if(menuClose){
+
+  menuClose.addEventListener(
+    "click",
+    () => toggleMenu(false)
+  );
+
+}
+
+
+if(drawerBackdrop){
+
+  drawerBackdrop.addEventListener(
+    "click",
+    () => toggleMenu(false)
+  );
+
+}
+
+
+if(mobileDrawer){
+
+  mobileDrawer
+    .querySelectorAll("a")
+    .forEach(link => {
+
+      link.addEventListener(
+        "click",
+        () => toggleMenu(false)
+      );
+
+    });
+
+}
+
+
+/* =========================
+   ESC KEY
+========================= */
+
+document.addEventListener(
+  "keydown",
+  event => {
+
+    if(event.key !== "Escape")
+      return;
+
+
+    closeCart();
+
+    closeSearch();
+
+    toggleMenu(false);
+
+  }
+);
+
+
+/* =========================
+   INITIAL CART
+========================= */
+
+updateCartCount();
+renderCart();
+
