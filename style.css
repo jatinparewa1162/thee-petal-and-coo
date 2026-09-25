@@ -1109,6 +1109,83 @@ footer{
   display:none;
 }
 
+/* Mobile menu is hidden on desktop and becomes a real drawer on mobile. */
+@media(max-width:800px){
+
+  .mobile-drawer{
+    display:block;
+    position:fixed;
+    top:0;
+    left:0;
+    bottom:0;
+    width:min(320px,86vw);
+    background:var(--cream);
+    z-index:160;
+    transform:translateX(-105%);
+    visibility:hidden;
+    transition:transform .3s ease, visibility .3s ease;
+    box-shadow:12px 0 35px rgba(50,25,15,.15);
+    padding:78px 28px 30px;
+    overflow-y:auto;
+  }
+
+  .mobile-drawer.open{
+    transform:translateX(0);
+    visibility:visible;
+  }
+
+  .mobile-drawer .drawer-close{
+    position:absolute;
+    top:18px;
+    right:18px;
+    width:42px;
+    height:42px;
+    border:1px solid var(--line);
+    border-radius:50%;
+    background:#fffaf2;
+    color:var(--brown);
+    font-size:28px;
+    line-height:1;
+  }
+
+  .mobile-drawer nav{
+    display:flex;
+    flex-direction:column;
+    gap:6px;
+  }
+
+  .mobile-drawer nav a{
+    display:block;
+    padding:17px 4px;
+    border-bottom:1px solid var(--line);
+    font-family:'Playfair Display',serif;
+    font-size:25px;
+    color:var(--brown);
+  }
+
+  .mobile-drawer nav a:active{
+    color:var(--red);
+  }
+
+  .drawer-backdrop{
+    display:block;
+    position:fixed;
+    inset:0;
+    z-index:150;
+    background:rgba(40,20,15,.38);
+    opacity:0;
+    visibility:hidden;
+    pointer-events:none;
+    transition:opacity .3s ease, visibility .3s ease;
+  }
+
+  .drawer-backdrop.open{
+    opacity:1;
+    visibility:visible;
+    pointer-events:auto;
+  }
+}
+
 
 /* MOBILE */
 

@@ -1193,6 +1193,113 @@ if(mobileMenu){
 
 
 /* =====================================================
+   AUTO-FILL CUSTOM ORDER FROM CART
+===================================================== */
+
+function autoFillCustomOrder(){
+
+  const raw = sessionStorage.getItem("petalCartOrder");
+
+  if(!raw){
+    return;
+  }
+
+  let orderData;
+
+  try{
+    orderData = JSON.parse(raw);
+  }catch(error){
+    console.error("Could not read saved cart order:", error);
+    sessionStorage.removeItem("petalCartOrder");
+    return;
+  }
+
+  const form = document.querySelector("#custom-form");
+
+  if(!form){
+    return;
+  }
+
+  const products = Array.isArray(orderData.products)
+    ? orderData.products
+    : [];
+
+  if(!products.length){
+    return;
+  }
+
+  const firstProduct = products[0];
+
+  /* Fill product type when the cart product category matches an option. */
+  const productField = form.querySelector('[name="product"]');
+  if(productField && firstProduct.category){
+    const category = String(firstProduct.category).trim();
+    const option = Array.from(productField.options).find(
+      option => option.value.trim().toLowerCase() === category.toLowerCase()
+    );
+    if(option){
+      productField.value = option.value;
+    }
+  }
+
+  /* Pick budget automatically from the cart total. */
+  const budgetField = form.querySelector('[name="budget"]');
+  const total = Number(orderData.total || 0);
+
+  if(budgetField && total > 0){
+    let budget = "₹500 – ₹1,000";
+
+    if(total >= 2000){
+      budget = "₹2,000+";
+    }else if(total > 1000){
+      budget = "₹1,000 – ₹2,000";
+    }
+
+    const option = Array.from(budgetField.options).find(
+      option => option.value === budget
+    );
+
+    if(option){
+      budgetField.value = budget;
+    }
+  }
+
+  /* Put the cart contents into the custom-message field. */
+  const messageField = form.querySelector('[name="message"]');
+
+  if(messageField){
+    const lines = products.map(function(item){
+      const quantity = Number(item.quantity || 1);
+      const price = Number(item.priceNumber || item.price || 0);
+      const lineTotal = quantity * price;
+
+      return `${item.name} × ${quantity} — ₹${lineTotal.toLocaleString("en-IN")}`;
+    });
+
+    const cartMessage =
+      "I'd like to order:\n" +
+      lines.join("\n") +
+      `\n\nCart total: ₹${total.toLocaleString("en-IN")}`;
+
+    /* Don't overwrite anything the customer may already have typed. */
+    if(!messageField.value.trim()){
+      messageField.value = cartMessage;
+    }
+  }
+
+  /* Remove the one-time payload so a normal refresh doesn't refill the form again. */
+  sessionStorage.removeItem("petalCartOrder");
+
+}
+
+/* Run after the page/form is available. */
+if(document.readyState === "loading"){
+  document.addEventListener("DOMContentLoaded", autoFillCustomOrder);
+}else{
+  autoFillCustomOrder();
+}
+
+/* =====================================================
    CUSTOM ORDER FORM + PHOTO UPLOAD
 ===================================================== */
 
