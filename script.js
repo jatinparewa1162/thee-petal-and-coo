@@ -1,29 +1,48 @@
+/* =========================================================
+   THEE PETAL AND CO.
+   FULL WEBSITE JAVASCRIPT
+========================================================= */
+
+
+/* =========================
+   PRODUCTS
+========================= */
+
 const products = [
   {
     name: 'The Pink Promise',
     price: '₹899',
+    priceNumber: 899,
     tag: 'best seller',
     image: 'https://images.unsplash.com/photo-1523438885200-e635ba2c371e?auto=format&fit=crop&w=900&q=85'
   },
   {
     name: 'Strawberry Fields',
     price: '₹699',
+    priceNumber: 699,
     tag: 'new in',
     image: 'https://images.unsplash.com/photo-1490750967868-88aa4486c946?auto=format&fit=crop&w=900&q=85'
   },
   {
     name: 'Sunshine, Always',
     price: '₹799',
+    priceNumber: 799,
     tag: '',
     image: 'https://images.unsplash.com/photo-1527061011665-3652c757a4d4?auto=format&fit=crop&w=900&q=85'
   },
   {
     name: 'A Little Something',
     price: '₹499',
+    priceNumber: 499,
     tag: '',
     image: 'https://images.unsplash.com/photo-1455582916367-25f75bfc6710?auto=format&fit=crop&w=900&q=85'
   }
 ];
+
+
+/* =========================
+   INSTAGRAM
+========================= */
 
 const instagramImages = [
   'https://images.unsplash.com/photo-1490750967868-88aa4486c946?auto=format&fit=crop&w=500&q=80',
@@ -41,20 +60,79 @@ const instagramImages = [
 
 let cart = [];
 
+
+/* =========================
+   HELPER
+========================= */
+
+function formatPrice(amount) {
+  return '₹' + amount.toLocaleString('en-IN');
+}
+
+
+/* =========================
+   CART ELEMENTS
+========================= */
+
+const bagButton = document.querySelector('#bag-button');
+const cartCountElement = document.querySelector('#cart-count');
+
+const cartDrawer =
+  document.querySelector('#cart-drawer') ||
+  document.querySelector('.cart-drawer');
+
+const cartBackdrop =
+  document.querySelector('#cart-backdrop') ||
+  document.querySelector('.cart-backdrop');
+
+const cartItems =
+  document.querySelector('#cart-items') ||
+  document.querySelector('.cart-items');
+
+const cartEmpty =
+  document.querySelector('#cart-empty') ||
+  document.querySelector('.cart-empty');
+
+const cartTotal =
+  document.querySelector('#cart-total') ||
+  document.querySelector('.cart-total');
+
+const cartClose =
+  document.querySelector('#cart-close') ||
+  document.querySelector('.cart-close');
+
+const customiseButton =
+  document.querySelector('#customise-order') ||
+  document.querySelector('#customize-order') ||
+  document.querySelector('#checkout-button') ||
+  document.querySelector('.customise-order');
+
+
+/* =========================
+   UPDATE CART COUNT
+========================= */
+
 function updateCartCount() {
 
-  const badge = document.querySelector('#cart-count');
-
   const totalItems = cart.reduce(
-    (total, item) => total + item.quantity,
+    (sum, item) => sum + item.quantity,
     0
   );
 
-  badge.textContent = totalItems;
-  badge.hidden = totalItems === 0;
+  if (cartCountElement) {
+
+    cartCountElement.textContent = totalItems;
+
+    cartCountElement.hidden = totalItems === 0;
+
+  }
 
 }
 
+
+/* =========================
+   ADD TO CART
+========================= */
 
 function addToCart(product) {
 
@@ -81,13 +159,40 @@ function addToCart(product) {
 }
 
 
-function changeQuantity(index, change) {
+/* =========================
+   REMOVE FROM CART
+========================= */
 
-  cart[index].quantity += change;
+function removeFromCart(productName) {
 
-  if (cart[index].quantity <= 0) {
+  cart = cart.filter(
+    item => item.name !== productName
+  );
 
-    cart.splice(index, 1);
+  updateCartCount();
+  renderCart();
+
+}
+
+
+/* =========================
+   CHANGE QUANTITY
+========================= */
+
+function changeQuantity(productName, change) {
+
+  const item = cart.find(
+    product => product.name === productName
+  );
+
+  if (!item) return;
+
+  item.quantity += change;
+
+  if (item.quantity <= 0) {
+
+    removeFromCart(productName);
+    return;
 
   }
 
@@ -97,266 +202,397 @@ function changeQuantity(index, change) {
 }
 
 
-function removeFromCart(index) {
+/* =========================
+   CART TOTAL
+========================= */
 
-  cart.splice(index, 1);
+function getCartTotal() {
 
-  updateCartCount();
-  renderCart();
-
-}
-
-
-function getPrice(price) {
-
-  return Number(
-    price.replace(/[₹,]/g, '')
+  return cart.reduce(
+    (total, item) =>
+      total + (item.priceNumber * item.quantity),
+    0
   );
 
 }
 
 
+/* =========================
+   RENDER CART
+========================= */
+
 function renderCart() {
 
-  const existingCart = document.querySelector('#cart-panel');
+  if (!cartItems) return;
 
-  if (!existingCart) return;
-
-  const cartItems = document.querySelector('#cart-items');
-  const cartTotal = document.querySelector('#cart-total');
+  cartItems.innerHTML = '';
 
   if (cart.length === 0) {
 
-    cartItems.innerHTML = `
-      <div class="empty-cart">
-        <p>Your bag is empty ♡</p>
-        <button
-          class="button primary"
-          id="continue-shopping"
-        >
-          Continue shopping
-        </button>
-      </div>
-    `;
+    if (cartEmpty) {
+      cartEmpty.hidden = false;
+    }
 
-    cartTotal.textContent = '₹0';
-
-    document
-      .querySelector('#continue-shopping')
-      .addEventListener('click', closeCart);
+    if (cartTotal) {
+      cartTotal.textContent = '₹0';
+    }
 
     return;
 
   }
 
 
-  let total = 0;
+  if (cartEmpty) {
+    cartEmpty.hidden = true;
+  }
 
-  cartItems.innerHTML = cart.map((item, index) => {
 
-    const itemPrice = getPrice(item.price);
-    const itemTotal = itemPrice * item.quantity;
+  cart.forEach(item => {
 
-    total += itemTotal;
+    const cartItem = document.createElement('div');
 
-    return `
-      <div class="cart-item">
+    cartItem.className = 'cart-item';
 
+    cartItem.innerHTML = `
+      <div class="cart-item-image">
         <img
           src="${item.image}"
           alt="${item.name}"
         >
+      </div>
 
-        <div class="cart-item-info">
+      <div class="cart-item-info">
 
-          <h3>${item.name}</h3>
+        <h4>${item.name}</h4>
 
-          <p>${item.price}</p>
+        <p>${formatPrice(item.priceNumber)}</p>
 
-          <div class="quantity-controls">
+        <div class="cart-quantity">
 
-            <button
-              class="quantity-minus"
-              data-index="${index}"
-            >
-              −
-            </button>
+          <button
+            type="button"
+            class="qty-minus"
+            aria-label="Decrease quantity"
+          >
+            −
+          </button>
 
-            <span>${item.quantity}</span>
+          <span>${item.quantity}</span>
 
-            <button
-              class="quantity-plus"
-              data-index="${index}"
-            >
-              +
-            </button>
-
-          </div>
+          <button
+            type="button"
+            class="qty-plus"
+            aria-label="Increase quantity"
+          >
+            +
+          </button>
 
         </div>
 
         <button
-          class="remove-cart"
-          data-index="${index}"
-          aria-label="Remove ${item.name}"
+          type="button"
+          class="remove-cart-item"
         >
-          ×
+          Remove
         </button>
 
       </div>
     `;
 
-  }).join('');
 
+    cartItem
+      .querySelector('.qty-minus')
+      .addEventListener('click', () => {
 
-  cartTotal.textContent =
-    `₹${total.toLocaleString('en-IN')}`;
-
-
-  document
-    .querySelectorAll('.quantity-minus')
-    .forEach(button => {
-
-      button.addEventListener('click', () => {
-
-        changeQuantity(
-          Number(button.dataset.index),
-          -1
-        );
+        changeQuantity(item.name, -1);
 
       });
 
-    });
 
+    cartItem
+      .querySelector('.qty-plus')
+      .addEventListener('click', () => {
 
-  document
-    .querySelectorAll('.quantity-plus')
-    .forEach(button => {
-
-      button.addEventListener('click', () => {
-
-        changeQuantity(
-          Number(button.dataset.index),
-          1
-        );
+        changeQuantity(item.name, 1);
 
       });
 
-    });
 
+    cartItem
+      .querySelector('.remove-cart-item')
+      .addEventListener('click', () => {
 
-  document
-    .querySelectorAll('.remove-cart')
-    .forEach(button => {
-
-      button.addEventListener('click', () => {
-
-        removeFromCart(
-          Number(button.dataset.index)
-        );
+        removeFromCart(item.name);
 
       });
 
-    });
+
+    cartItems.appendChild(cartItem);
+
+  });
+
+
+  if (cartTotal) {
+
+    cartTotal.textContent =
+      formatPrice(getCartTotal());
+
+  }
 
 }
 
 
 /* =========================
-   CART UI
+   OPEN CART
 ========================= */
-
-const cartPanel = document.createElement('aside');
-
-cartPanel.id = 'cart-panel';
-
-cartPanel.innerHTML = `
-  <div class="cart-header">
-
-    <h2>Your Bag</h2>
-
-    <button
-      id="cart-close"
-      aria-label="Close cart"
-    >
-      ×
-    </button>
-
-  </div>
-
-  <div id="cart-items"></div>
-
-  <div class="cart-footer">
-
-    <div class="cart-total-row">
-
-      <span>Total</span>
-
-      <strong id="cart-total">
-        ₹0
-      </strong>
-
-    </div>
-
-    <a
-      href="#custom"
-      class="button primary cart-custom-button"
-      id="cart-custom-button"
-    >
-      Customise / Order
-      <span>→</span>
-    </a>
-
-  </div>
-`;
-
-document.body.appendChild(cartPanel);
-
-
-const cartBackdrop = document.createElement('div');
-
-cartBackdrop.id = 'cart-backdrop';
-
-document.body.appendChild(cartBackdrop);
-
 
 function openCart() {
 
-  cartPanel.classList.add('open');
-  cartBackdrop.classList.add('open');
+  if (cartDrawer) {
 
-  renderCart();
+    cartDrawer.classList.add('open');
+
+  }
+
+  if (cartBackdrop) {
+
+    cartBackdrop.classList.add('open');
+
+  }
 
 }
 
+
+/* =========================
+   CLOSE CART
+========================= */
 
 function closeCart() {
 
-  cartPanel.classList.remove('open');
-  cartBackdrop.classList.remove('open');
+  if (cartDrawer) {
+
+    cartDrawer.classList.remove('open');
+
+  }
+
+  if (cartBackdrop) {
+
+    cartBackdrop.classList.remove('open');
+
+  }
 
 }
 
 
-document
-  .querySelector('#bag-button')
-  .addEventListener('click', openCart);
+/* =========================
+   BAG BUTTON
+========================= */
+
+if (bagButton) {
+
+  bagButton.addEventListener('click', () => {
+
+    renderCart();
+    openCart();
+
+  });
+
+}
 
 
-document
-  .querySelector('#cart-close')
-  .addEventListener('click', closeCart);
+/* =========================
+   CLOSE BUTTON
+========================= */
+
+if (cartClose) {
+
+  cartClose.addEventListener('click', closeCart);
+
+}
 
 
-cartBackdrop.addEventListener(
-  'click',
-  closeCart
-);
+if (cartBackdrop) {
+
+  cartBackdrop.addEventListener(
+    'click',
+    closeCart
+  );
+
+}
 
 
-document
-  .querySelector('#cart-custom-button')
-  .addEventListener('click', closeCart);
+/* =========================
+   CUSTOMISE / ORDER
+========================= */
+
+if (customiseButton) {
+
+  customiseButton.addEventListener('click', () => {
+
+    /*
+      If cart is empty,
+      simply go to custom order section.
+    */
+
+    if (cart.length === 0) {
+
+      closeCart();
+
+      const customSection =
+        document.querySelector('#custom');
+
+      if (customSection) {
+
+        customSection.scrollIntoView({
+          behavior: 'smooth'
+        });
+
+      }
+
+      return;
+
+    }
+
+
+    /*
+      Create selected product text.
+    */
+
+    const selectedProducts = cart
+      .map(item =>
+        `${item.name} × ${item.quantity}`
+      )
+      .join(', ');
+
+
+    const total = getCartTotal();
+
+
+    /*
+      Product dropdown.
+    */
+
+    const productField =
+      document.querySelector('#product');
+
+
+    /*
+      Message field.
+    */
+
+    const messageField =
+      document.querySelector('#message');
+
+
+    /*
+      Try to select product automatically
+      if dropdown has matching option.
+    */
+
+    if (productField) {
+
+      const matchingOption =
+        [...productField.options].find(
+          option =>
+            option.textContent
+              .trim()
+              .toLowerCase() ===
+            cart[0].name
+              .trim()
+              .toLowerCase()
+        );
+
+
+      if (matchingOption) {
+
+        productField.value =
+          matchingOption.value;
+
+      } else {
+
+        /*
+          If multiple/custom products,
+          select Custom if available.
+        */
+
+        const customOption =
+          [...productField.options].find(
+            option =>
+              option.textContent
+                .toLowerCase()
+                .includes('custom')
+          );
+
+
+        if (customOption) {
+
+          productField.value =
+            customOption.value;
+
+        }
+
+      }
+
+    }
+
+
+    /*
+      Add cart details into message.
+    */
+
+    if (messageField) {
+
+      const cartMessage =
+        `Selected items: ${selectedProducts}\n` +
+        `Estimated total: ${formatPrice(total)}\n\n`;
+
+      /*
+        Don't destroy anything already typed.
+      */
+
+      if (
+        !messageField.value
+          .includes('Selected items:')
+      ) {
+
+        messageField.value =
+          cartMessage + messageField.value;
+
+      }
+
+    }
+
+
+    /*
+      Close cart.
+    */
+
+    closeCart();
+
+
+    /*
+      Go to custom order form.
+    */
+
+    const customSection =
+      document.querySelector('#custom');
+
+    if (customSection) {
+
+      setTimeout(() => {
+
+        customSection.scrollIntoView({
+          behavior: 'smooth',
+          block: 'start'
+        });
+
+      }, 200);
+
+    }
+
+  });
+
+}
 
 
 /* =========================
@@ -367,81 +603,106 @@ const productRoot =
   document.querySelector('#products');
 
 
-products.forEach((product) => {
+if (productRoot) {
 
-  const card =
-    document.createElement('article');
-
-  card.className =
-    'product-card';
+  productRoot.innerHTML = '';
 
 
-  card.innerHTML = `
+  products.forEach((product) => {
 
-    <div class="product-image">
-
-      <img
-        src="${product.image}"
-        alt="${product.name}"
-        loading="lazy"
-      >
-
-      ${
-        product.tag
-          ? `<span class="tag">${product.tag}</span>`
-          : ''
-      }
-
-      <button
-        class="add-button"
-        aria-label="Add ${product.name} to bag"
-      >
-        ♧
-      </button>
-
-    </div>
+    const card =
+      document.createElement('article');
 
 
-    <div class="product-info">
+    card.className =
+      'product-card';
 
-      <div>
 
-        <h3>${product.name}</h3>
+    card.innerHTML = `
+      <div class="product-image">
 
-        <p>${product.price}</p>
+        <img
+          src="${product.image}"
+          alt="${product.name}"
+          loading="lazy"
+        >
+
+        ${
+          product.tag
+            ? `<span class="tag">${product.tag}</span>`
+            : ''
+        }
+
+        <button
+          class="add-button"
+          aria-label="Add ${product.name} to bag"
+          type="button"
+        >
+          ♧
+        </button>
 
       </div>
 
 
-      <button
-        class="heart"
-        aria-label="Save ${product.name}"
-      >
-        ♡
-      </button>
+      <div class="product-info">
 
-    </div>
+        <div>
 
-  `;
+          <h3>${product.name}</h3>
+
+          <p>${product.price}</p>
+
+        </div>
 
 
-  card
-    .querySelector('.add-button')
-    .addEventListener(
-      'click',
-      () => {
+        <button
+          class="heart"
+          aria-label="Save ${product.name}"
+          type="button"
+        >
+          ♡
+        </button>
+
+      </div>
+    `;
+
+
+    /*
+      Add to Bag.
+    */
+
+    card
+      .querySelector('.add-button')
+      .addEventListener('click', () => {
 
         addToCart(product);
 
-        openCart();
-
-      }
-    );
+      });
 
 
-  productRoot.appendChild(card);
+    /*
+      Wishlist heart.
+    */
 
-});
+    card
+      .querySelector('.heart')
+      .addEventListener('click', function () {
+
+        this.classList.toggle('saved');
+
+        this.textContent =
+          this.classList.contains('saved')
+            ? '♥'
+            : '♡';
+
+      });
+
+
+    productRoot.appendChild(card);
+
+  });
+
+}
 
 
 /* =========================
@@ -452,35 +713,41 @@ const instaRoot =
   document.querySelector('#instagram-grid');
 
 
-instagramImages.forEach(
-  (src, index) => {
+if (instaRoot) {
+
+  instaRoot.innerHTML = '';
+
+
+  instagramImages.forEach((src, index) => {
 
     const link =
       document.createElement('a');
 
+
     link.href =
       'https://instagram.com/thhepetalandco';
 
-    link.target = '_blank';
+    link.target =
+      '_blank';
 
-    link.rel = 'noreferrer';
+    link.rel =
+      'noreferrer';
 
 
     link.innerHTML = `
-
       <img
         src="${src}"
         alt="Instagram post ${index + 1}"
         loading="lazy"
       >
-
     `;
 
 
     instaRoot.appendChild(link);
 
-  }
-);
+  });
+
+}
 
 
 /* =========================
@@ -496,10 +763,14 @@ const backdrop =
 
 function toggleMenu(open) {
 
+  if (!drawer || !backdrop) return;
+
+
   drawer.classList.toggle(
     'open',
     open
   );
+
 
   backdrop.classList.toggle(
     'open',
@@ -515,51 +786,63 @@ function toggleMenu(open) {
 }
 
 
-document
-  .querySelector('#menu-open')
-  .addEventListener(
+const menuOpen =
+  document.querySelector('#menu-open');
+
+
+const menuClose =
+  document.querySelector('#menu-close');
+
+
+if (menuOpen) {
+
+  menuOpen.addEventListener(
     'click',
-    () => {
-      toggleMenu(true);
-    }
+    () => toggleMenu(true)
   );
 
+}
 
-document
-  .querySelector('#menu-close')
-  .addEventListener(
+
+if (menuClose) {
+
+  menuClose.addEventListener(
     'click',
-    () => {
-      toggleMenu(false);
-    }
+    () => toggleMenu(false)
   );
 
-
-backdrop.addEventListener(
-  'click',
-  () => {
-    toggleMenu(false);
-  }
-);
+}
 
 
-drawer
-  .querySelectorAll('a')
-  .forEach((link) => {
+if (backdrop) {
 
-    link.addEventListener(
-      'click',
-      () => {
-        toggleMenu(false);
-      }
-    );
+  backdrop.addEventListener(
+    'click',
+    () => toggleMenu(false)
+  );
 
-  });
+}
+
+
+if (drawer) {
+
+  drawer
+    .querySelectorAll('a')
+    .forEach(link => {
+
+      link.addEventListener(
+        'click',
+        () => toggleMenu(false)
+      );
+
+    });
+
+}
 
 
 /* =========================
-   CUSTOM ORDER + PHOTO
-   EXISTING WORKING SYSTEM
+   CUSTOM ORDER FORM
+   GOOGLE SHEET + DRIVE
 ========================= */
 
 const customForm =
@@ -567,7 +850,6 @@ const customForm =
 
 const successMessage =
   document.querySelector('#form-success');
-
 
 const photoInput =
   document.querySelector('#photo');
@@ -582,143 +864,219 @@ const photoMimeType =
   document.querySelector('#photoMimeType');
 
 
-customForm.addEventListener(
-  'submit',
-  function (event) {
+if (customForm) {
 
-    event.preventDefault();
+  customForm.addEventListener(
+    'submit',
+    function (event) {
 
-    const file =
-      photoInput.files[0];
+      event.preventDefault();
 
 
-    if (!file) {
+      const file =
+        photoInput &&
+        photoInput.files[0];
 
-      customForm.submit();
 
-      setTimeout(() => {
+      /*
+        NO PHOTO
+      */
 
-        successMessage.hidden = false;
+      if (!file) {
 
-        customForm.reset();
+        customForm.submit();
 
-      }, 1500);
 
-      return;
+        setTimeout(() => {
+
+          if (successMessage) {
+            successMessage.hidden = false;
+          }
+
+          customForm.reset();
+
+          /*
+            Cart clear after order request.
+          */
+
+          cart = [];
+
+          updateCartCount();
+          renderCart();
+
+        }, 1500);
+
+
+        return;
+
+      }
+
+
+      /*
+        PHOTO COMPRESSION
+      */
+
+      const reader =
+        new FileReader();
+
+
+      reader.onload =
+        function () {
+
+          const img =
+            new Image();
+
+
+          img.onload =
+            function () {
+
+              const canvas =
+                document.createElement('canvas');
+
+
+              const maxWidth = 1200;
+              const maxHeight = 1200;
+
+
+              let width =
+                img.width;
+
+              let height =
+                img.height;
+
+
+              if (width > maxWidth) {
+
+                height =
+                  height *
+                  (maxWidth / width);
+
+                width =
+                  maxWidth;
+
+              }
+
+
+              if (height > maxHeight) {
+
+                width =
+                  width *
+                  (maxHeight / height);
+
+                height =
+                  maxHeight;
+
+              }
+
+
+              canvas.width =
+                width;
+
+              canvas.height =
+                height;
+
+
+              const ctx =
+                canvas.getContext('2d');
+
+
+              ctx.drawImage(
+                img,
+                0,
+                0,
+                width,
+                height
+              );
+
+
+              const compressedData =
+                canvas.toDataURL(
+                  'image/jpeg',
+                  0.75
+                );
+
+
+              if (photoData) {
+
+                photoData.value =
+                  compressedData;
+
+              }
+
+
+              if (photoName) {
+
+                photoName.value =
+                  file.name
+                    .replace(/\.[^/.]+$/, '') +
+                  '.jpg';
+
+              }
+
+
+              if (photoMimeType) {
+
+                photoMimeType.value =
+                  'image/jpeg';
+
+              }
+
+
+              /*
+                IMPORTANT:
+                Native submit keeps the existing
+                Google Apps Script + hidden iframe
+                system working.
+              */
+
+              customForm.submit();
+
+
+              setTimeout(() => {
+
+                if (successMessage) {
+
+                  successMessage.hidden =
+                    false;
+
+                }
+
+
+                customForm.reset();
+
+
+                /*
+                  Clear cart after order request.
+                */
+
+                cart = [];
+
+                updateCartCount();
+                renderCart();
+
+              }, 1500);
+
+            };
+
+
+          img.src =
+            reader.result;
+
+        };
+
+
+      reader.readAsDataURL(file);
 
     }
 
+  );
 
-    const reader =
-      new FileReader();
-
-
-    reader.onload =
-      function () {
-
-        const img =
-          new Image();
+}
 
 
-        img.onload =
-          function () {
+/* =========================
+   INITIAL STATE
+========================= */
 
-            const canvas =
-              document.createElement(
-                'canvas'
-              );
-
-
-            const maxWidth = 1200;
-            const maxHeight = 1200;
-
-
-            let width = img.width;
-            let height = img.height;
-
-
-            if (width > maxWidth) {
-
-              height =
-                height *
-                (maxWidth / width);
-
-              width = maxWidth;
-
-            }
-
-
-            if (height > maxHeight) {
-
-              width =
-                width *
-                (maxHeight / height);
-
-              height = maxHeight;
-
-            }
-
-
-            canvas.width = width;
-            canvas.height = height;
-
-
-            const ctx =
-              canvas.getContext('2d');
-
-
-            ctx.drawImage(
-              img,
-              0,
-              0,
-              width,
-              height
-            );
-
-
-            const compressedData =
-              canvas.toDataURL(
-                'image/jpeg',
-                0.75
-              );
-
-
-            photoData.value =
-              compressedData;
-
-
-            photoName.value =
-              file.name.replace(
-                /\.[^/.]+$/,
-                ''
-              ) + '.jpg';
-
-
-            photoMimeType.value =
-              'image/jpeg';
-
-
-            customForm.submit();
-
-
-            setTimeout(() => {
-
-              successMessage.hidden =
-                false;
-
-              customForm.reset();
-
-            }, 1500);
-
-          };
-
-
-        img.src = reader.result;
-
-      };
-
-
-    reader.readAsDataURL(file);
-
-  }
-);
+updateCartCount();
+renderCart();
