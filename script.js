@@ -1,5 +1,10 @@
+/* =====================================================
+   THEE PETAL AND CO.
+   FINAL SCRIPT — PART 1/4
+===================================================== */
+
 const PRODUCTS_API_URL =
-  "https://script.google.com/macros/s/AKfycbwOkwuQQDuGm8Ndx08pKKkklXkJCr4agUtUJ1J1FQYkc0YtSynFsAinYmj_GiSab0SuY/exec";
+  "https://script.google.com/macros/s/AKfycbwOkwuQQDuGm8Ndx08pKKkklXkJCr4agUtUJ1JfQYkc0YtSynFsAinYmj_GiSab0SuY/exec";
 
 const PRODUCTS_CACHE_KEY =
   "petalProductsCache";
@@ -12,13 +17,33 @@ const PRODUCTS_CACHE_MAX_AGE =
 
 let products = [];
 
+let cart = JSON.parse(
+  localStorage.getItem("petalCart") || "[]"
+);
 
-/* =========================
+
+/* =====================================================
+   BASIC HELPERS
+===================================================== */
+
+function formatPrice(price){
+
+  const number = Number(price) || 0;
+
+  return "₹" +
+    number.toLocaleString("en-IN");
+
+}
+
+
+/* =====================================================
    PRODUCT CACHE
-========================= */
+===================================================== */
 
 function saveProductsCache(data){
+
   try{
+
     localStorage.setItem(
       PRODUCTS_CACHE_KEY,
       JSON.stringify(data)
@@ -28,14 +53,23 @@ function saveProductsCache(data){
       PRODUCTS_CACHE_TIME,
       String(Date.now())
     );
+
   }catch(error){
-    console.warn("Product cache could not be saved:", error);
+
+    console.warn(
+      "Product cache save failed:",
+      error
+    );
+
   }
+
 }
 
 
 function getProductsCache(){
+
   try{
+
     const cached =
       localStorage.getItem(
         PRODUCTS_CACHE_KEY
@@ -45,230 +79,862 @@ function getProductsCache(){
       return null;
     }
 
-    return JSON.parse(cached);
-
-  }catch(error){
-    console.warn("Product cache could not be read:", error);
-    return null;
-  }
-}
-
-
-function isProductsCacheFresh(){
-  try{
-    const savedTime =
-      Number(
-        localStorage.getItem(
-          PRODUCTS_CACHE_TIME
-        )
-      );
-
-    if(!savedTime){
-      return false;
-    }
-
-    return (
-      Date.now() - savedTime
-      < PRODUCTS_CACHE_MAX_AGE
-    );
-
-  }catch(error){
-    return false;
-  }
-}
-
-async function loadProductsFromSheet(){
-
-  if(!productsContainer){
-    return;
-  }
-
-  /*
-   * STEP 1
-   * Pehle cached products dikhao
-   */
-  const cachedProducts =
-    getProductsCache();
-
-  if(
-    Array.isArray(cachedProducts) &&
-    cachedProducts.length > 0
-  ){
-
-    products =
-      cachedProducts;
-
-    renderHomeProducts();
-  }
-
-
-  /*
-   * STEP 2
-   * Google Sheet se latest products
-   * background mein load karo
-   */
-  try{
-
-    const response =
-      await fetch(
-        PRODUCTS_API_URL,
-        {
-          cache:"no-store"
-        }
-      );
-
-    if(!response.ok){
-      throw new Error(
-        "Products API failed"
-      );
-    }
-
     const data =
-      await response.json();
+      JSON.parse(cached);
 
-    if(!Array.isArray(data)){
-      throw new Error(
-        "Invalid products data"
-      );
-    }
-
-
-    /*
-     * Sheet data ko website format mein convert
-     */
-    const freshProducts =
-      data
-      .map(function(item,index){
-
-        const priceNumber =
-          Number(
-            String(
-              item.PRICE || ""
-            ).replace(
-              /[^0-9.]/g,
-              ""
-            )
-          );
-
-        return {
-
-          id:
-            String(
-              item.ID ||
-              `P${String(
-                index + 1
-              ).padStart(3,"0")}`
-            ),
-
-          name:
-            String(
-              item.NAME || ""
-            ).trim(),
-
-          priceNumber:
-            priceNumber,
-
-          price:
-            formatPrice(
-              priceNumber
-            ),
-
-          category:
-            String(
-              item.CATEGORY || ""
-            ).trim(),
-
-          description:
-            String(
-              item.DESCRIPTION || ""
-            ).trim(),
-
-          image:
-            String(
-              item.IMAGE || ""
-            ).trim(),
-
-          bestSeller:
-            String(
-              item.BEST_SELLER || ""
-            )
-            .trim()
-            .toUpperCase()
-            === "YES",
-
-          newArrival:
-            String(
-              item.NEW_ARRIVAL || ""
-            )
-            .trim()
-            .toUpperCase()
-            === "YES",
-
-          active:
-            String(
-              item.ACTIVE || ""
-            )
-            .trim()
-            .toUpperCase()
-            === "YES"
-        };
-
-      })
-      .filter(function(product){
-
-        return (
-          product.active &&
-          product.name &&
-          product.priceNumber > 0 &&
-          product.image
-        );
-
-      });
-
-
-    /*
-     * Latest Sheet data save
-     * aur screen update
-     */
-    products =
-      freshProducts;
-
-    saveProductsCache(
-      freshProducts
-    );
-
-    renderHomeProducts();
-
+    return Array.isArray(data)
+      ? data
+      : null;
 
   }catch(error){
 
-    console.error(
-      "Could not load products from Google Sheet:",
+    console.warn(
+      "Product cache read failed:",
       error
     );
 
+    return null;
 
-    /*
-     * Agar cache bhi nahi hai
-     * tabhi error message dikhao
-     */
+  }
+
+}
+
+
+/* =====================================================
+   DOM ELEMENTS
+===================================================== */
+
+const productsContainer =
+  document.querySelector("#products");
+
+const cartCountElement =
+  document.querySelector("#cart-count");
+
+const bagButton =
+  document.querySelector("#bag-button");
+
+const cartDrawer =
+  document.querySelector("#cart-drawer");
+
+const cartBackdrop =
+  document.querySelector("#cart-backdrop");
+
+const cartClose =
+  document.querySelector("#cart-close");
+
+const cartItems =
+  document.querySelector("#cart-items");
+
+const cartEmpty =
+  document.querySelector("#cart-empty");
+
+const cartTotal =
+  document.querySelector("#cart-total");
+
+const customiseOrder =
+  document.querySelector("#customise-order");
+
+
+/* =====================================================
+   CART
+===================================================== */
+
+function saveCart(){
+
+  localStorage.setItem(
+    "petalCart",
+    JSON.stringify(cart)
+  );
+
+}
+
+
+function updateCartCount(){
+
+  if(!cartCountElement){
+    return;
+  }
+
+  const total =
+    cart.reduce(
+      function(sum,item){
+        return sum + item.quantity;
+      },
+      0
+    );
+
+  cartCountElement.textContent =
+    total;
+
+  cartCountElement.hidden =
+    total === 0;
+
+}
+
+
+function addToCart(product){
+
+  const existing =
+    cart.find(
+      function(item){
+        return item.id === product.id;
+      }
+    );
+
+  if(existing){
+
+    existing.quantity += 1;
+
+  }else{
+
+    cart.push({
+      id: product.id,
+      name: product.name,
+      priceNumber: product.priceNumber,
+      price: product.price,
+      image: product.image,
+      quantity: 1
+    });
+
+  }
+
+  saveCart();
+  updateCartCount();
+  renderCart();
+
+  openCart();
+
+}
+
+
+function removeFromCart(productId){
+
+  cart =
+    cart.filter(
+      function(item){
+        return item.id !== productId;
+      }
+    );
+
+  saveCart();
+  updateCartCount();
+  renderCart();
+
+}
+
+
+function changeCartQuantity(
+  productId,
+  change
+){
+
+  const item =
+    cart.find(
+      function(product){
+        return product.id === productId;
+      }
+    );
+
+  if(!item){
+    return;
+  }
+
+  item.quantity += change;
+
+  if(item.quantity <= 0){
+
+    removeFromCart(productId);
+    return;
+
+  }
+
+  saveCart();
+  updateCartCount();
+  renderCart();
+
+}
+
+
+function getCartTotal(){
+
+  return cart.reduce(
+    function(total,item){
+
+      return total +
+        (
+          item.priceNumber *
+          item.quantity
+        );
+
+    },
+    0
+  );
+
+}
+
+
+/* =====================================================
+   CART DRAWER
+===================================================== */
+
+function openCart(){
+
+  if(!cartDrawer || !cartBackdrop){
+    return;
+  }
+
+  cartDrawer.classList.add("open");
+  cartBackdrop.classList.add("open");
+
+}
+
+
+function closeCart(){
+
+  if(!cartDrawer || !cartBackdrop){
+    return;
+  }
+
+  cartDrawer.classList.remove("open");
+  cartBackdrop.classList.remove("open");
+
+}
+
+
+function renderCart(){
+
+  if(!cartItems){
+    return;
+  }
+
+  const oldItems =
+    cartItems.querySelectorAll(
+      ".cart-product"
+    );
+
+  oldItems.forEach(
+    function(item){
+      item.remove();
+    }
+  );
+
+
+  if(cart.length === 0){
+
+    if(cartEmpty){
+      cartEmpty.hidden = false;
+    }
+
+    if(cartTotal){
+      cartTotal.textContent = "₹0";
+    }
+
+    return;
+
+  }
+
+
+  if(cartEmpty){
+    cartEmpty.hidden = true;
+  }
+
+
+  cart.forEach(
+    function(item){
+
+      const row =
+        document.createElement("div");
+
+      row.className =
+        "cart-product";
+
+
+      row.innerHTML = `
+
+        <div class="cart-product-image">
+          <img
+            src="${item.image}"
+            alt="${item.name}"
+          >
+        </div>
+
+        <div class="cart-product-info">
+
+          <strong>
+            ${item.name}
+          </strong>
+
+          <span>
+            ${item.price}
+          </span>
+
+          <div class="cart-product-controls">
+
+            <button
+              type="button"
+              class="cart-minus"
+            >
+              −
+            </button>
+
+            <span>
+              ${item.quantity}
+            </span>
+
+            <button
+              type="button"
+              class="cart-plus"
+            >
+              +
+            </button>
+
+          </div>
+
+        </div>
+
+        <button
+          type="button"
+          class="cart-remove"
+          aria-label="Remove ${item.name}"
+        >
+          ×
+        </button>
+
+      `;
+
+
+      row
+        .querySelector(".cart-minus")
+        .addEventListener(
+          "click",
+          function(){
+
+            changeCartQuantity(
+              item.id,
+              -1
+            );
+
+          }
+        );
+
+
+      row
+        .querySelector(".cart-plus")
+        .addEventListener(
+          "click",
+          function(){
+
+            changeCartQuantity(
+              item.id,
+              1
+            );
+
+          }
+        );
+
+
+      row
+        .querySelector(".cart-remove")
+        .addEventListener(
+          "click",
+          function(){
+
+            removeFromCart(
+              item.id
+            );
+
+          }
+        );
+
+
+      cartItems.appendChild(row);
+
+    }
+  );
+
+
+  if(cartTotal){
+
+    cartTotal.textContent =
+      formatPrice(
+        getCartTotal()
+      );
+
+  }
+
+}
+
+
+/* =====================================================
+   CART EVENTS
+===================================================== */
+
+if(bagButton){
+
+  bagButton.addEventListener(
+    "click",
+    function(){
+
+      renderCart();
+      openCart();
+
+    }
+  );
+
+}
+
+
+if(cartClose){
+
+  cartClose.addEventListener(
+    "click",
+    closeCart
+  );
+
+}
+
+
+if(cartBackdrop){
+
+  cartBackdrop.addEventListener(
+    "click",
+    closeCart
+  );
+
+}
+
+
+if(customiseOrder){
+
+  customiseOrder.addEventListener(
+    "click",
+    function(){
+
+      closeCart();
+
+      const customSection =
+        document.querySelector(
+          "#custom"
+        );
+
+      if(customSection){
+
+        customSection.scrollIntoView({
+          behavior: "smooth"
+        });
+
+      }else{
+
+        window.location.href =
+          "index.html#custom";
+
+      }
+
+    }
+  );
+
+}
+
+
+/* =====================================================
+   INITIAL CART
+===================================================== */
+
+updateCartCount();
+renderCart();
+
+/* =====================================================
+   SEARCH
+===================================================== */
+
+const searchOverlay =
+  document.querySelector("#search-overlay");
+
+const searchClose =
+  document.querySelector("#search-close");
+
+const searchInput =
+  document.querySelector("#product-search");
+
+const searchClear =
+  document.querySelector("#search-clear");
+
+const searchResults =
+  document.querySelector("#search-results");
+
+const searchHint =
+  document.querySelector("#search-hint");
+
+
+function openSearch(){
+
+  if(!searchOverlay){
+    return;
+  }
+
+  searchOverlay.classList.add("open");
+  searchOverlay.setAttribute(
+    "aria-hidden",
+    "false"
+  );
+
+  if(searchInput){
+
+    setTimeout(
+      function(){
+        searchInput.focus();
+      },
+      100
+    );
+
+  }
+
+}
+
+
+function closeSearch(){
+
+  if(!searchOverlay){
+    return;
+  }
+
+  searchOverlay.classList.remove("open");
+  searchOverlay.setAttribute(
+    "aria-hidden",
+    "true"
+  );
+
+}
+
+
+function searchProducts(query){
+
+  const text =
+    String(query || "")
+      .trim()
+      .toLowerCase();
+
+  if(!text){
+    return [];
+  }
+
+  return products.filter(
+    function(product){
+
+      const searchable = [
+        product.name,
+        product.category,
+        product.description
+      ]
+      .join(" ")
+      .toLowerCase();
+
+      return searchable.includes(text);
+
+    }
+  );
+
+}
+
+
+function renderSearchResults(query){
+
+  if(!searchResults){
+    return;
+  }
+
+  searchResults.innerHTML = "";
+
+  const text =
+    String(query || "").trim();
+
+
+  if(!text){
+
+    if(searchHint){
+      searchHint.textContent =
+        "Search our blooms";
+    }
+
+    if(searchClear){
+      searchClear.hidden = true;
+    }
+
+    return;
+
+  }
+
+
+  if(searchClear){
+    searchClear.hidden = false;
+  }
+
+
+  const results =
+    searchProducts(text);
+
+
+  if(searchHint){
+
+    searchHint.textContent =
+      results.length
+        ? `${results.length} bloom${results.length > 1 ? "s" : ""} found`
+        : "No blooms found";
+
+  }
+
+
+  results.forEach(
+    function(product){
+
+      const button =
+        document.createElement("button");
+
+      button.type = "button";
+      button.className = "search-result";
+
+
+      button.innerHTML = `
+
+        <img
+          src="${product.image}"
+          alt="${product.name}"
+          loading="lazy"
+        >
+
+        <span>
+
+          <strong>
+            ${product.name}
+          </strong>
+
+          <small>
+            ${product.category}
+          </small>
+
+        </span>
+
+        <b>
+          ${product.price}
+        </b>
+
+      `;
+
+
+      button.addEventListener(
+        "click",
+        function(){
+
+          closeSearch();
+
+          const shopUrl =
+            "shop.html?search=" +
+            encodeURIComponent(
+              product.name
+            );
+
+          window.location.href =
+            shopUrl;
+
+        }
+      );
+
+
+      searchResults.appendChild(
+        button
+      );
+
+    }
+  );
+
+}
+
+
+/* Search button(s) */
+
+document
+  .querySelectorAll(".search-button")
+  .forEach(
+    function(button){
+
+      button.addEventListener(
+        "click",
+        openSearch
+      );
+
+    }
+  );
+
+
+if(searchClose){
+
+  searchClose.addEventListener(
+    "click",
+    closeSearch
+  );
+
+}
+
+
+if(searchInput){
+
+  searchInput.addEventListener(
+    "input",
+    function(){
+
+      renderSearchResults(
+        searchInput.value
+      );
+
+    }
+  );
+
+}
+
+
+if(searchClear){
+
+  searchClear.addEventListener(
+    "click",
+    function(){
+
+      if(searchInput){
+
+        searchInput.value = "";
+        searchInput.focus();
+
+      }
+
+      renderSearchResults("");
+
+    }
+  );
+
+}
+
+
+if(searchOverlay){
+
+  searchOverlay.addEventListener(
+    "click",
+    function(event){
+
+      if(
+        event.target ===
+        searchOverlay
+      ){
+
+        closeSearch();
+
+      }
+
+    }
+  );
+
+}
+
+
+/* =====================================================
+   KEYBOARD SHORTCUTS
+===================================================== */
+
+document.addEventListener(
+  "keydown",
+  function(event){
+
     if(
-      !Array.isArray(cachedProducts) ||
-      cachedProducts.length === 0
+      event.key === "Escape"
     ){
 
-      productsContainer.innerHTML = `
-        <div class="shop-empty">
-          <div>♡</div>
-          <h2>Our blooms are resting</h2>
-          <p>Please check back in a little while.</p>
-        </div>
-      `;
+      closeSearch();
+      closeCart();
 
     }
 
   }
+);
+
+/* =====================================================
+   GOOGLE SHEET PRODUCTS
+   CACHE FIRST + BACKGROUND UPDATE
+===================================================== */
+
+function normalizeProduct(raw){
+
+  const priceNumber =
+    Number(
+      String(raw.PRICE || "")
+        .replace(/[₹,\s]/g, "")
+    ) || 0;
+
+
+  const category =
+    String(
+      raw.CATEGORY || ""
+    ).trim();
+
+
+  const bestSeller =
+    String(
+      raw.BEST_SELLER || ""
+    )
+    .trim()
+    .toUpperCase() === "YES";
+
+
+  const active =
+    String(
+      raw.ACTIVE || ""
+    )
+    .trim()
+    .toUpperCase() === "YES";
+
+
+  return {
+
+    id: String(
+      raw.ID || ""
+    ).trim(),
+
+    name: String(
+      raw.NAME || ""
+    ).trim(),
+
+    priceNumber: priceNumber,
+
+    price: formatPrice(
+      priceNumber
+    ),
+
+    category: category,
+
+    description: String(
+      raw.DESCRIPTION || ""
+    ).trim(),
+
+    image: String(
+      raw.IMAGE || ""
+    ).trim(),
+
+    bestSeller: bestSeller,
+
+    newArrival:
+      String(
+        raw.NEW_ARRIVAL || ""
+      )
+      .trim()
+      .toUpperCase() === "YES",
+
+    active: active
+
+  };
+
 }
+
+
+/* =====================================================
+   RENDER HOME PRODUCTS
+===================================================== */
 
 function renderHomeProducts(){
 
@@ -278,219 +944,693 @@ function renderHomeProducts(){
 
   productsContainer.innerHTML = "";
 
-  const homeProducts =
-    products
-      .filter(function(product){
+
+  const activeProducts =
+    products.filter(
+      function(product){
         return product.active;
-      })
-      .slice(0,8);
+      }
+    );
 
 
-  if(homeProducts.length === 0){
-
-    productsContainer.innerHTML = `
-      <div class="shop-empty">
-        <div>♡</div>
-        <h2>Something lovely is coming</h2>
-        <p>We're still making something lovely.</p>
-      </div>
-    `;
-
+  if(activeProducts.length === 0){
     return;
   }
 
 
-  homeProducts.forEach(function(product){
+  /*
+    Home par maximum 8 products
+    show honge.
+  */
 
-    const card =
-      document.createElement("article");
+  activeProducts
+    .slice(0, 8)
+    .forEach(
+      function(product, index){
 
-    card.className =
-      "product-card";
+        const card =
+          document.createElement("article");
+
+        card.className =
+          "product-card";
 
 
-    card.innerHTML = `
-
-      <div class="product-image-wrap">
-
-        <img
-          src="${product.image}"
-          alt="${product.name}"
-          class="product-image"
-          fetchpriority="high"
-        >
-
-        ${
+        const tag =
           product.bestSeller
-            ? `<span class="product-tag">best seller</span>`
-            : ""
-        }
-
-        <button
-          type="button"
-          class="product-heart"
-          aria-label="Save ${product.name} to bag"
-        >
-          ♡
-        </button>
-
-      </div>
+            ? "best seller"
+            : product.newArrival
+              ? "new in"
+              : "";
 
 
-      <div class="product-info">
+        card.innerHTML = `
 
-        <h3>${product.name}</h3>
+          <div class="product-image-wrap">
 
-        ${
-          product.description
-            ? `
-              <p class="product-description">
-                ${product.description}
+            <img
+              class="product-image"
+              src="${product.image}"
+              alt="${product.name}"
+              ${index < 4
+                ? 'loading="eager" fetchpriority="high"'
+                : 'loading="lazy"'}
+            >
+
+            ${
+              tag
+                ? `<span class="tag">${tag}</span>`
+                : ""
+            }
+
+            <button
+              type="button"
+              class="add-button"
+              aria-label="Add ${product.name} to bag"
+            >
+              ♧
+            </button>
+
+          </div>
+
+
+          <div class="product-info">
+
+            <div>
+
+              <h3>
+                ${product.name}
+              </h3>
+
+              <p>
+                ${product.price}
               </p>
-            `
-            : ""
-        }
 
-        <div class="product-bottom">
-
-          <span class="product-price">
-            ${product.price}
-          </span>
-
-          <button
-            type="button"
-            class="add-to-bag"
-            aria-label="Add ${product.name} to bag"
-          >
-            ♧
-          </button>
-
-        </div>
-
-      </div>
-    `;
+            </div>
 
 
-    const addButton =
-      card.querySelector(
-        ".add-to-bag"
-      );
+            <button
+              type="button"
+              class="heart"
+              aria-label="Save ${product.name}"
+            >
+              ♡
+            </button>
 
-    const heartButton =
-      card.querySelector(
-        ".product-heart"
-      );
+          </div>
 
-
-    if(addButton){
-
-      addButton.addEventListener(
-        "click",
-        function(){
-
-          addToCart(product);
-
-        }
-      );
-
-    }
+        `;
 
 
-    if(heartButton){
-
-      heartButton.addEventListener(
-        "click",
-        function(){
-
-          heartButton.classList.toggle(
-            "saved"
+        const addButton =
+          card.querySelector(
+            ".add-button"
           );
 
-          heartButton.textContent =
-            heartButton.classList.contains(
-              "saved"
-            )
-              ? "♥"
-              : "♡";
+
+        if(addButton){
+
+          addButton.addEventListener(
+            "click",
+            function(event){
+
+              event.preventDefault();
+              event.stopPropagation();
+
+              addToCart(product);
+
+            }
+          );
 
         }
-      );
-
-    }
 
 
-    productsContainer.appendChild(
-      card
+        productsContainer.appendChild(
+          card
+        );
+
+      }
     );
-
-  });
 
 }
 
-function startProductLoading(){
+
+/* =====================================================
+   LOAD PRODUCTS FROM GOOGLE SHEET
+===================================================== */
+
+async function loadProductsFromSheet(){
 
   /*
-   * Cache available hai to products
-   * turant show honge.
-   *
-   * Sheet background mein update hoti rahegi.
-   */
+    STEP 1:
+    Cache se turant products dikhao.
+  */
+
+  const cached =
+    getProductsCache();
+
+
+  if(cached && cached.length){
+
+    products =
+      cached.map(
+        normalizeProduct
+      );
+
+
+    renderHomeProducts();
+
+  }
+
+
+  /*
+    STEP 2:
+    Google Sheet se latest data
+    background mein fetch karo.
+  */
+
+  try{
+
+    const response =
+      await fetch(
+        PRODUCTS_API_URL,
+        {
+          method: "GET",
+          cache: "no-store"
+        }
+      );
+
+
+    if(!response.ok){
+
+      throw new Error(
+        "Products request failed"
+      );
+
+    }
+
+
+    const data =
+      await response.json();
+
+
+    if(!Array.isArray(data)){
+
+      throw new Error(
+        "Invalid products data"
+      );
+
+    }
+
+
+    const freshProducts =
+      data
+        .map(normalizeProduct)
+        .filter(
+          function(product){
+
+            return (
+              product.active &&
+              product.name
+            );
+
+          }
+        );
+
+
+    /*
+      Latest Sheet data save
+      karke next visit instant
+      kar denge.
+    */
+
+    products =
+      freshProducts;
+
+
+    saveProductsCache(
+      freshProducts
+    );
+
+
+    /*
+      Fresh data aane ke baad
+      screen silently update.
+    */
+
+    renderHomeProducts();
+
+
+  }catch(error){
+
+    console.warn(
+      "Google Sheet products could not load:",
+      error
+    );
+
+
+    /*
+      Agar internet/API fail ho gaya
+      toh cached products already
+      screen par rahenge.
+    */
+
+  }
+
+}
+
+
+/* =====================================================
+   START PRODUCT LOADING
+===================================================== */
+
+function startProductLoading(){
+
   loadProductsFromSheet();
 
 }
 
 
-/* =========================
-   SEARCH
-========================= */
-
-function searchProducts(query){
-
-  const searchText =
-    String(query || "")
-      .trim()
-      .toLowerCase();
-
-  if(!searchText){
-    return [];
-  }
-
-  return products.filter(function(product){
-
-    return (
-      product.name
-        .toLowerCase()
-        .includes(searchText) ||
-
-      product.category
-        .toLowerCase()
-        .includes(searchText) ||
-
-      product.description
-        .toLowerCase()
-        .includes(searchText)
-    );
-
-  });
-
-}
-
-
-/* =========================
+/* =====================================================
    START
-========================= */
+===================================================== */
 
-if(
-  document.readyState === "loading"
-){
+startProductLoading();
 
-  document.addEventListener(
-    "DOMContentLoaded",
-    startProductLoading
+/* =====================================================
+   INSTAGRAM
+===================================================== */
+
+const instagramImages = [
+  "https://images.unsplash.com/photo-1490750967868-88aa4486c946?auto=format&fit=crop&w=500&q=80",
+  "https://images.unsplash.com/photo-1523438885200-e635ba2c371e?auto=format&fit=crop&w=500&q=80",
+  "https://images.unsplash.com/photo-1527061011665-3652c757a4d4?auto=format&fit=crop&w=500&q=80",
+  "https://images.unsplash.com/photo-1455582916367-25f75bfc6710?auto=format&fit=crop&w=500&q=80",
+  "https://images.unsplash.com/photo-1526047932273-341f2a7631f9?auto=format&fit=crop&w=500&q=80",
+  "https://images.unsplash.com/photo-1468327768560-75b778cbb551?auto=format&fit=crop&w=500&q=80"
+];
+
+const instagramRoot =
+  document.querySelector(
+    "#instagram-grid"
   );
 
-}else{
 
-  startProductLoading();
+if(instagramRoot){
+
+  instagramImages.forEach(
+    function(src, index){
+
+      const link =
+        document.createElement("a");
+
+      link.href =
+        "https://instagram.com/thhepetalandco";
+
+      link.target = "_blank";
+      link.rel = "noreferrer";
+
+
+      link.innerHTML = `
+
+        <img
+          src="${src}"
+          alt="Instagram post ${index + 1}"
+          loading="lazy"
+        >
+
+      `;
+
+
+      instagramRoot.appendChild(
+        link
+      );
+
+    }
+  );
 
 }
+
+
+/* =====================================================
+   MOBILE MENU
+===================================================== */
+
+const mobileMenu =
+  document.querySelector(
+    "#mobile-drawer"
+  );
+
+const menuBackdrop =
+  document.querySelector(
+    "#drawer-backdrop"
+  );
+
+const menuOpen =
+  document.querySelector(
+    "#menu-open"
+  );
+
+const menuClose =
+  document.querySelector(
+    "#menu-close"
+  );
+
+
+function toggleMenu(open){
+
+  if(!mobileMenu){
+    return;
+  }
+
+
+  mobileMenu.classList.toggle(
+    "open",
+    open
+  );
+
+
+  if(menuBackdrop){
+
+    menuBackdrop.classList.toggle(
+      "open",
+      open
+    );
+
+  }
+
+
+  mobileMenu.setAttribute(
+    "aria-hidden",
+    String(!open)
+  );
+
+}
+
+
+if(menuOpen){
+
+  menuOpen.addEventListener(
+    "click",
+    function(){
+      toggleMenu(true);
+    }
+  );
+
+}
+
+
+if(menuClose){
+
+  menuClose.addEventListener(
+    "click",
+    function(){
+      toggleMenu(false);
+    }
+  );
+
+}
+
+
+if(menuBackdrop){
+
+  menuBackdrop.addEventListener(
+    "click",
+    function(){
+      toggleMenu(false);
+    }
+  );
+
+}
+
+
+if(mobileMenu){
+
+  mobileMenu
+    .querySelectorAll("a")
+    .forEach(
+      function(link){
+
+        link.addEventListener(
+          "click",
+          function(){
+            toggleMenu(false);
+          }
+        );
+
+      }
+    );
+
+}
+
+
+/* =====================================================
+   CUSTOM ORDER FORM + PHOTO UPLOAD
+===================================================== */
+
+const customForm =
+  document.querySelector(
+    "#custom-form"
+  );
+
+const successMessage =
+  document.querySelector(
+    "#form-success"
+  );
+
+const photoInput =
+  document.querySelector(
+    "#photo"
+  );
+
+const photoData =
+  document.querySelector(
+    "#photoData"
+  );
+
+const photoName =
+  document.querySelector(
+    "#photoName"
+  );
+
+const photoMimeType =
+  document.querySelector(
+    "#photoMimeType"
+  );
+
+
+if(customForm){
+
+  customForm.addEventListener(
+    "submit",
+    function(event){
+
+      event.preventDefault();
+
+
+      const file =
+        photoInput &&
+        photoInput.files &&
+        photoInput.files[0];
+
+
+      /*
+        No photo:
+        existing Apps Script form
+        ko normally submit karo.
+      */
+
+      if(!file){
+
+        customForm.submit();
+
+        setTimeout(
+          function(){
+
+            if(successMessage){
+
+              successMessage.hidden =
+                false;
+
+            }
+
+            customForm.reset();
+
+          },
+          1500
+        );
+
+        return;
+
+      }
+
+
+      /*
+        Photo ko compress karke
+        Apps Script ko bhejna.
+      */
+
+      const reader =
+        new FileReader();
+
+
+      reader.onload =
+        function(){
+
+          const img =
+            new Image();
+
+
+          img.onload =
+            function(){
+
+              const canvas =
+                document.createElement(
+                  "canvas"
+                );
+
+
+              const maxWidth = 1200;
+              const maxHeight = 1200;
+
+
+              let width =
+                img.width;
+
+              let height =
+                img.height;
+
+
+              if(width > maxWidth){
+
+                height =
+                  height *
+                  (
+                    maxWidth /
+                    width
+                  );
+
+                width =
+                  maxWidth;
+
+              }
+
+
+              if(height > maxHeight){
+
+                width =
+                  width *
+                  (
+                    maxHeight /
+                    height
+                  );
+
+                height =
+                  maxHeight;
+
+              }
+
+
+              canvas.width =
+                width;
+
+              canvas.height =
+                height;
+
+
+              const ctx =
+                canvas.getContext(
+                  "2d"
+                );
+
+
+              ctx.drawImage(
+                img,
+                0,
+                0,
+                width,
+                height
+              );
+
+
+              const compressedData =
+                canvas.toDataURL(
+                  "image/jpeg",
+                  0.75
+                );
+
+
+              if(photoData){
+
+                photoData.value =
+                  compressedData;
+
+              }
+
+
+              if(photoName){
+
+                photoName.value =
+                  file.name
+                    .replace(
+                      /\.[^/.]+$/,
+                      ""
+                    ) +
+                  ".jpg";
+
+              }
+
+
+              if(photoMimeType){
+
+                photoMimeType.value =
+                  "image/jpeg";
+
+              }
+
+
+              customForm.submit();
+
+
+              setTimeout(
+                function(){
+
+                  if(successMessage){
+
+                    successMessage.hidden =
+                      false;
+
+                  }
+
+                  customForm.reset();
+
+                },
+                1500
+              );
+
+            };
+
+
+          img.src =
+            reader.result;
+
+        };
+
+
+      reader.readAsDataURL(file);
+
+    }
+  );
+
+}
+
+
+/* =====================================================
+   FINAL INITIALIZATION
+===================================================== */
+
+updateCartCount();
+renderCart();
+
+console.log(
+  "THEE PETAL AND CO. loaded successfully."
+);
