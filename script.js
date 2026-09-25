@@ -1,35 +1,56 @@
 const PRODUCTS_API_URL = "https://script.google.com/macros/s/AKfycbwOkwuQQDuGm8Ndx08pKKkklXkJCr4agUtUJ1JfQYkc0YtSynFsAinYmj_GiSab0SuY/exec";
 
-const products = [
+/* =========================
+   FALLBACK PRODUCTS
+========================= */
+
+let products = [
   {
-    name:'The Pink Promise',
-    price:'₹899',
-    priceNumber:899,
-    tag:'best seller',
-    image:'https://images.unsplash.com/photo-1523438885200-e635ba2c371e?auto=format&fit=crop&w=900&q=85'
+    id: 'P001',
+    name: 'The Pink Promise',
+    price: '₹899',
+    priceNumber: 899,
+    tag: 'best seller',
+    category: 'Bouquets',
+    description: 'Handmade pink flower bouquet',
+    image: 'https://images.unsplash.com/photo-1523438885200-e635ba2c371e?auto=format&fit=crop&w=900&q=85'
   },
   {
-    name:'Strawberry Fields',
-    price:'₹699',
-    priceNumber:699,
-    tag:'new in',
-    image:'https://images.unsplash.com/photo-1490750967868-88aa4486c946?auto=format&fit=crop&w=900&q=85'
+    id: 'P002',
+    name: 'Strawberry Fields',
+    price: '₹699',
+    priceNumber: 699,
+    tag: 'new in',
+    category: 'Bouquets',
+    description: 'Beautiful handmade floral arrangement',
+    image: 'https://images.unsplash.com/photo-1490750967868-88aa4486c946?auto=format&fit=crop&w=900&q=85'
   },
   {
-    name:'Sunshine, Always',
-    price:'₹799',
-    priceNumber:799,
-    tag:'',
-    image:'https://images.unsplash.com/photo-1527061011665-3652c757a4d4?auto=format&fit=crop&w=900&q=85'
+    id: 'P003',
+    name: 'Sunshine, Always',
+    price: '₹799',
+    priceNumber: 799,
+    tag: '',
+    category: 'Bouquets',
+    description: 'A cheerful handmade flower bouquet',
+    image: 'https://images.unsplash.com/photo-1527061011665-3652c757a4d4?auto=format&fit=crop&w=900&q=85'
   },
   {
-    name:'A Little Something',
-    price:'₹499',
-    priceNumber:499,
-    tag:'',
-    image:'https://images.unsplash.com/photo-1455582916367-25f75bfc6710?auto=format&fit=crop&w=900&q=85'
+    id: 'P004',
+    name: 'A Little Something',
+    price: '₹499',
+    priceNumber: 499,
+    tag: '',
+    category: 'Gifts',
+    description: 'A sweet handmade little gift',
+    image: 'https://images.unsplash.com/photo-1455582916367-25f75bfc6710?auto=format&fit=crop&w=900&q=85'
   }
 ];
+
+
+/* =========================
+   INSTAGRAM
+========================= */
 
 const instagramImages = [
   'https://images.unsplash.com/photo-1490750967868-88aa4486c946?auto=format&fit=crop&w=500&q=80',
@@ -40,11 +61,21 @@ const instagramImages = [
   'https://images.unsplash.com/photo-1468327768560-75b778cbb551?auto=format&fit=crop&w=500&q=80'
 ];
 
+
+/* =========================
+   BASIC HELPERS
+========================= */
+
 let cart = [];
 
 function formatPrice(amount){
-  return '₹' + Number(amount).toLocaleString('en-IN');
+  return '₹' + Number(amount || 0).toLocaleString('en-IN');
 }
+
+
+/* =========================
+   DOM ELEMENTS
+========================= */
 
 const bagButton = document.querySelector('#bag-button');
 const cartCount = document.querySelector('#cart-count');
@@ -59,30 +90,46 @@ const customiseOrder = document.querySelector(
   '#customise-order,#customize-order,#checkout-button,.customise-order'
 );
 
+
+/* =========================
+   CART COUNT
+========================= */
+
 function updateCartCount(){
-  if(!cartCount)return;
+
+  if(!cartCount) return;
 
   const count = cart.reduce(
-    (total,item)=>total+item.quantity,0
+    (total,item) => total + item.quantity,
+    0
   );
 
-  cartCount.textContent=count;
-  cartCount.hidden=count===0;
+  cartCount.textContent = count;
+  cartCount.hidden = count === 0;
 }
+
+
+/* =========================
+   ADD TO CART
+========================= */
 
 function addToCart(product){
 
-  const existing=cart.find(
-    item=>item.name===product.name
+  const existing = cart.find(
+    item => item.name === product.name
   );
 
   if(existing){
-    existing.quantity+=1;
+
+    existing.quantity += 1;
+
   }else{
+
     cart.push({
       ...product,
-      quantity:1
+      quantity: 1
     });
+
   }
 
   updateCartCount();
@@ -90,66 +137,97 @@ function addToCart(product){
   openCart();
 }
 
+
+/* =========================
+   REMOVE FROM CART
+========================= */
+
 function removeFromCart(name){
-  cart=cart.filter(item=>item.name!==name);
+
+  cart = cart.filter(
+    item => item.name !== name
+  );
+
   updateCartCount();
   renderCart();
 }
 
+
+/* =========================
+   QUANTITY
+========================= */
+
 function changeQuantity(name,change){
 
-  const item=cart.find(
-    product=>product.name===name
+  const item = cart.find(
+    product => product.name === name
   );
 
-  if(!item)return;
+  if(!item) return;
 
-  item.quantity+=change;
+  item.quantity += change;
 
-  if(item.quantity<=0){
+  if(item.quantity <= 0){
+
     removeFromCart(name);
     return;
+
   }
 
   updateCartCount();
   renderCart();
 }
 
+
+/* =========================
+   CART TOTAL
+========================= */
+
 function getCartTotal(){
+
   return cart.reduce(
-    (total,item)=>
-      total+item.priceNumber*item.quantity,
+    (total,item) =>
+      total + item.priceNumber * item.quantity,
     0
   );
+
 }
+
+
+/* =========================
+   RENDER CART
+========================= */
 
 function renderCart(){
 
-  if(!cartItems)return;
+  if(!cartItems) return;
 
-  cartItems.innerHTML='';
+  cartItems.innerHTML = '';
 
-  if(cart.length===0){
+  if(cart.length === 0){
 
     if(cartEmpty)
       cartItems.appendChild(cartEmpty);
 
     if(cartTotal)
-      cartTotal.textContent='₹0';
+      cartTotal.textContent = '₹0';
 
     return;
   }
 
-  cart.forEach(item=>{
 
-    const el=document.createElement('div');
+  cart.forEach(item => {
 
-    el.className='cart-item';
+    const el = document.createElement('div');
 
-    el.innerHTML=`
-      <img src="${item.image}"
-           alt="${item.name}"
-           class="cart-item-image">
+    el.className = 'cart-item';
+
+    el.innerHTML = `
+      <img
+        src="${item.image}"
+        alt="${item.name}"
+        class="cart-item-image"
+      >
 
       <div class="cart-item-info">
 
@@ -161,18 +239,24 @@ function renderCart(){
 
           <div class="quantity-controls">
 
-            <button type="button"
-              class="qty-minus">−</button>
+            <button
+              type="button"
+              class="qty-minus"
+            >−</button>
 
             <span>${item.quantity}</span>
 
-            <button type="button"
-              class="qty-plus">+</button>
+            <button
+              type="button"
+              class="qty-plus"
+            >+</button>
 
           </div>
 
-          <button type="button"
-            class="cart-remove">
+          <button
+            type="button"
+            class="cart-remove"
+          >
             Remove
           </button>
 
@@ -181,28 +265,43 @@ function renderCart(){
       </div>
     `;
 
+
     el.querySelector('.qty-minus')
-      .addEventListener('click',()=>{
-        changeQuantity(item.name,-1);
-      });
+      .addEventListener(
+        'click',
+        () => changeQuantity(item.name,-1)
+      );
+
 
     el.querySelector('.qty-plus')
-      .addEventListener('click',()=>{
-        changeQuantity(item.name,1);
-      });
+      .addEventListener(
+        'click',
+        () => changeQuantity(item.name,1)
+      );
+
 
     el.querySelector('.cart-remove')
-      .addEventListener('click',()=>{
-        removeFromCart(item.name);
-      });
+      .addEventListener(
+        'click',
+        () => removeFromCart(item.name)
+      );
+
 
     cartItems.appendChild(el);
+
   });
 
+
   if(cartTotal)
-    cartTotal.textContent=formatPrice(getCartTotal());
+    cartTotal.textContent =
+      formatPrice(getCartTotal());
+
 }
 
+
+/* =========================
+   OPEN CART
+========================= */
 
 function openCart(){
 
@@ -216,6 +315,10 @@ function openCart(){
 }
 
 
+/* =========================
+   CLOSE CART
+========================= */
+
 function closeCart(){
 
   if(cartDrawer)
@@ -228,30 +331,43 @@ function closeCart(){
 }
 
 
+/* =========================
+   CART BUTTON
+========================= */
+
 if(bagButton){
 
-  bagButton.addEventListener('click',()=>{
-    renderCart();
-    openCart();
-  });
+  bagButton.addEventListener(
+    'click',
+    () => {
+
+      renderCart();
+      openCart();
+
+    }
+  );
+
 }
 
 
 if(cartClose){
+
   cartClose.addEventListener(
     'click',
     closeCart
   );
+
 }
 
 
 if(cartBackdrop){
+
   cartBackdrop.addEventListener(
     'click',
     closeCart
   );
-}
 
+}
 
 /* =========================
    CUSTOMISE / ORDER
@@ -259,164 +375,219 @@ if(cartBackdrop){
 
 if(customiseOrder){
 
-  customiseOrder.addEventListener('click',()=>{
+  customiseOrder.addEventListener(
+    'click',
+    () => {
 
-    if(cart.length===0){
+      if(cart.length === 0){
+
+        closeCart();
+
+        const section =
+          document.querySelector('#custom');
+
+        if(section){
+
+          section.scrollIntoView({
+            behavior:'smooth'
+          });
+
+        }
+
+        return;
+      }
+
+
+      const selectedProducts =
+        cart
+          .map(
+            item =>
+              `${item.name} × ${item.quantity}`
+          )
+          .join(', ');
+
+
+      const totalText =
+        formatPrice(getCartTotal());
+
+
+      const productField =
+        document.querySelector('#product');
+
+      const budgetField =
+        document.querySelector('#budget');
+
+      const messageField =
+        document.querySelector('#message');
+
+
+      /* PRODUCT */
+
+      if(productField){
+
+        if(productField.tagName === 'SELECT'){
+
+          const old =
+            productField.querySelector(
+              'option[data-cart-order="true"]'
+            );
+
+          if(old)
+            old.remove();
+
+
+          const option =
+            document.createElement('option');
+
+          option.value =
+            selectedProducts;
+
+          option.textContent =
+            selectedProducts;
+
+          option.selected = true;
+
+          option.dataset.cartOrder =
+            'true';
+
+
+          productField.insertBefore(
+            option,
+            productField.firstChild
+          );
+
+
+          productField.dispatchEvent(
+            new Event(
+              'change',
+              { bubbles:true }
+            )
+          );
+
+
+        }else{
+
+          productField.value =
+            selectedProducts;
+
+        }
+
+      }
+
+
+      /* BUDGET */
+
+      if(budgetField){
+
+        if(budgetField.tagName === 'SELECT'){
+
+          const old =
+            budgetField.querySelector(
+              'option[data-cart-budget="true"]'
+            );
+
+          if(old)
+            old.remove();
+
+
+          const option =
+            document.createElement('option');
+
+          option.value =
+            totalText;
+
+          option.textContent =
+            `Selected Products Total: ${totalText}`;
+
+          option.selected = true;
+
+          option.dataset.cartBudget =
+            'true';
+
+
+          budgetField.insertBefore(
+            option,
+            budgetField.firstChild
+          );
+
+
+          budgetField.dispatchEvent(
+            new Event(
+              'change',
+              { bubbles:true }
+            )
+          );
+
+
+        }else{
+
+          budgetField.value =
+            totalText;
+
+        }
+
+      }
+
+
+      /* MESSAGE */
+
+      if(messageField){
+
+        const orderText =
+          `Selected Products: ${selectedProducts}\nEstimated Total: ${totalText}`;
+
+
+        const existing =
+          messageField.value.trim();
+
+
+        if(
+          !existing.includes(
+            'Selected Products:'
+          )
+        ){
+
+          messageField.value =
+            existing
+              ? `${existing}\n\n${orderText}`
+              : orderText;
+
+        }
+
+      }
+
 
       closeCart();
 
-      const section=
+
+      const section =
         document.querySelector('#custom');
 
+
       if(section){
+
         section.scrollIntoView({
           behavior:'smooth'
         });
+
       }
 
-      return;
+
+      setTimeout(
+        () => {
+
+          if(productField)
+            productField.focus();
+
+        },
+        700
+      );
+
     }
+  );
 
-    const selectedProducts=cart
-      .map(item=>`${item.name} × ${item.quantity}`)
-      .join(', ');
-
-    const totalText=
-      formatPrice(getCartTotal());
-
-    const productField=
-      document.querySelector('#product');
-
-    const budgetField=
-      document.querySelector('#budget');
-
-    const messageField=
-      document.querySelector('#message');
-
-
-    /* PRODUCT */
-
-    if(productField){
-
-      if(productField.tagName==='SELECT'){
-
-        const old=
-          productField.querySelector(
-            'option[data-cart-order="true"]'
-          );
-
-        if(old)old.remove();
-
-        const option=
-          document.createElement('option');
-
-        option.value=selectedProducts;
-        option.textContent=selectedProducts;
-        option.selected=true;
-        option.dataset.cartOrder='true';
-
-        productField.insertBefore(
-          option,
-          productField.firstChild
-        );
-
-        productField.dispatchEvent(
-          new Event('change',{
-            bubbles:true
-          })
-        );
-
-      }else{
-
-        productField.value=
-          selectedProducts;
-      }
-    }
-
-
-    /* BUDGET */
-
-    if(budgetField){
-
-      if(budgetField.tagName==='SELECT'){
-
-        const old=
-          budgetField.querySelector(
-            'option[data-cart-budget="true"]'
-          );
-
-        if(old)old.remove();
-
-        const option=
-          document.createElement('option');
-
-        option.value=totalText;
-
-        option.textContent=
-          `Selected Products Total: ${totalText}`;
-
-        option.selected=true;
-        option.dataset.cartBudget='true';
-
-        budgetField.insertBefore(
-          option,
-          budgetField.firstChild
-        );
-
-        budgetField.dispatchEvent(
-          new Event('change',{
-            bubbles:true
-          })
-        );
-
-      }else{
-
-        budgetField.value=totalText;
-      }
-    }
-
-
-    /* MESSAGE */
-
-    if(messageField){
-
-      const orderText=
-        `Selected Products: ${selectedProducts}\nEstimated Total: ${totalText}`;
-
-      const existing=
-        messageField.value.trim();
-
-      if(!existing.includes('Selected Products:')){
-
-        messageField.value=
-          existing
-            ? `${existing}\n\n${orderText}`
-            : orderText;
-      }
-    }
-
-
-    closeCart();
-
-    const section=
-      document.querySelector('#custom');
-
-    if(section){
-
-      section.scrollIntoView({
-        behavior:'smooth'
-      });
-    }
-
-    setTimeout(()=>{
-
-      if(productField)
-        productField.focus();
-
-    },700);
-
-  });
 }
+
 
 /* =========================
    PRODUCT CARDS
@@ -425,13 +596,17 @@ if(customiseOrder){
 const productsContainer =
   document.querySelector('#products');
 
+
 function createProductCard(product){
 
-  const card=document.createElement('article');
+  const card =
+    document.createElement('article');
 
-  card.className='product-card';
+  card.className =
+    'product-card';
 
-  card.innerHTML=`
+
+  card.innerHTML = `
     <div class="product-image-wrap">
 
       <img
@@ -450,9 +625,12 @@ function createProductCard(product){
         type="button"
         class="product-heart"
         aria-label="Save ${product.name}"
-      >♡</button>
+      >
+        ♡
+      </button>
 
     </div>
+
 
     <div class="product-info">
 
@@ -467,208 +645,432 @@ function createProductCard(product){
         <button
           type="button"
           class="add-to-bag"
-        >♧</button>
+        >
+          ♧
+        </button>
 
       </div>
 
     </div>
   `;
 
-  const addButton=
+
+  const addButton =
     card.querySelector('.add-to-bag');
 
-  const heartButton=
+
+  const heartButton =
     card.querySelector('.product-heart');
+
 
   if(addButton){
 
     addButton.addEventListener(
       'click',
-      ()=>addToCart(product)
+      () => addToCart(product)
     );
+
   }
+
 
   if(heartButton){
 
     heartButton.addEventListener(
       'click',
-      ()=>{
+      () => {
 
-        heartButton.classList.toggle('saved');
+        heartButton.classList.toggle(
+          'saved'
+        );
 
-        heartButton.textContent=
+        heartButton.textContent =
           heartButton.classList.contains('saved')
           ? '♥'
           : '♡';
+
       }
     );
+
   }
+
 
   return card;
 }
 
 
+/* =========================
+   RENDER PRODUCTS
+========================= */
+
 function renderProducts(list){
 
-  if(!productsContainer)return;
+  if(!productsContainer)
+    return;
 
-  productsContainer.innerHTML='';
+  productsContainer.innerHTML = '';
 
-  list.forEach(product=>{
+
+  list.forEach(product => {
+
     productsContainer.appendChild(
       createProductCard(product)
     );
+
   });
+
 }
 
 
+/* =========================
+   LOAD PRODUCTS FROM GOOGLE SHEET
+========================= */
+
+async function loadProductsFromSheet(){
+
+  try{
+
+    const response =
+      await fetch(PRODUCTS_API_URL, {
+        method:'GET',
+        cache:'no-store'
+      });
+
+
+    if(!response.ok)
+      throw new Error(
+        'Products API error'
+      );
+
+
+    const data =
+      await response.json();
+
+
+    if(!Array.isArray(data))
+      throw new Error(
+        'Invalid products data'
+      );
+
+
+    if(data.length === 0){
+
+      console.log(
+        'PRODUCTS sheet is empty. Using fallback products.'
+      );
+
+      renderProducts(products);
+
+      return;
+
+    }
+
+
+    const sheetProducts =
+      data
+        .map((item,index) => {
+
+          const priceNumber =
+            Number(
+              String(
+                item.PRICE || ''
+              ).replace(
+                /[^0-9.]/g,
+                ''
+              )
+            );
+
+
+          return {
+
+            id:
+              item.ID ||
+              `P${String(index + 1).padStart(3,'0')}`,
+
+            name:
+              String(
+                item.NAME || ''
+              ).trim(),
+
+            priceNumber:
+              priceNumber || 0,
+
+            price:
+              formatPrice(
+                priceNumber || 0
+              ),
+
+            tag:
+              String(
+                item.BEST_SELLER || ''
+              )
+              .trim()
+              .toUpperCase() === 'YES'
+              ? 'best seller'
+              : '',
+
+            category:
+              String(
+                item.CATEGORY || ''
+              ).trim(),
+
+            description:
+              String(
+                item.DESCRIPTION || ''
+              ).trim(),
+
+            image:
+              String(
+                item.IMAGE || ''
+              ).trim()
+
+          };
+
+        })
+        .filter(product => {
+
+          return (
+            product.name &&
+            product.priceNumber > 0 &&
+            product.image
+          );
+
+        });
+
+
+    if(sheetProducts.length === 0){
+
+      console.log(
+        'No valid products found. Using fallback products.'
+      );
+
+      renderProducts(products);
+
+      return;
+
+    }
+
+
+    products =
+      sheetProducts;
+
+
+    console.log(
+      'Products loaded from Google Sheet:',
+      products
+    );
+
+
+    renderProducts(products);
+
+
+  }catch(error){
+
+    console.error(
+      'Could not load products from Google Sheet:',
+      error
+    );
+
+
+    renderProducts(products);
+
+  }
+
+}
+
+
+/* Initial products first */
 renderProducts(products);
 
+/* Then load Sheet products */
+loadProductsFromSheet();
 
 /* =========================
    PREMIUM SEARCH
 ========================= */
 
-const searchButton=
+const searchButton =
   document.querySelector('.search-button');
 
-const searchOverlay=
+const searchOverlay =
   document.querySelector('#search-overlay');
 
-const searchClose=
+const searchClose =
   document.querySelector('#search-close');
 
-const productSearch=
+const productSearch =
   document.querySelector('#product-search');
 
-const searchClear=
+const searchClear =
   document.querySelector('#search-clear');
 
-const searchResults=
+const searchResults =
   document.querySelector('#search-results');
 
-const searchHint=
+const searchHint =
   document.querySelector('#search-hint');
 
 
 function openSearch(){
 
-  if(!searchOverlay)return;
+  if(!searchOverlay)
+    return;
+
 
   searchOverlay.classList.add('open');
+
 
   searchOverlay.setAttribute(
     'aria-hidden',
     'false'
   );
 
+
   document.body.classList.add(
     'search-open'
   );
 
-  setTimeout(()=>{
 
-    if(productSearch)
-      productSearch.focus();
+  setTimeout(
+    () => {
 
-  },150);
+      if(productSearch)
+        productSearch.focus();
+
+    },
+    150
+  );
+
 }
 
 
 function closeSearch(){
 
-  if(!searchOverlay)return;
+  if(!searchOverlay)
+    return;
 
-  searchOverlay.classList.remove('open');
+
+  searchOverlay.classList.remove(
+    'open'
+  );
+
 
   searchOverlay.setAttribute(
     'aria-hidden',
     'true'
   );
 
+
   document.body.classList.remove(
     'search-open'
   );
 
+
   if(productSearch)
-    productSearch.value='';
+    productSearch.value = '';
+
 
   if(searchClear)
-    searchClear.hidden=true;
+    searchClear.hidden = true;
+
 
   if(searchResults)
-    searchResults.innerHTML='';
+    searchResults.innerHTML = '';
 
-  if(searchHint)
-    searchHint.textContent=
+
+  if(searchHint){
+
+    searchHint.textContent =
       'Try “pink”, “bouquet” or “gift”';
+
+  }
+
 }
 
 
 function performSearch(){
 
-  if(!productSearch)return;
+  if(!productSearch)
+    return;
 
-  const query=
+
+  const query =
     productSearch.value
       .toLowerCase()
       .trim();
 
-  if(searchClear)
-    searchClear.hidden=!query;
 
-  if(!searchResults)return;
+  if(searchClear)
+    searchClear.hidden =
+      !query;
+
+
+  if(!searchResults)
+    return;
 
 
   if(!query){
 
-    searchResults.innerHTML='';
+    searchResults.innerHTML = '';
 
-    if(searchHint)
-      searchHint.textContent=
+
+    if(searchHint){
+
+      searchHint.textContent =
         'Try “pink”, “bouquet” or “gift”';
 
+    }
+
     return;
+
   }
 
 
-  const matches=
-    products.filter(product=>{
+  const matches =
+    products.filter(product => {
 
-      const text=`
+      const text = `
         ${product.name}
         ${product.tag}
         ${product.price}
+        ${product.category}
+        ${product.description}
       `.toLowerCase();
 
+
       return text.includes(query);
+
     });
 
 
   if(searchHint){
 
-    searchHint.textContent=
+    searchHint.textContent =
       matches.length
       ? `${matches.length} ${
-          matches.length===1
+          matches.length === 1
           ? 'bloom'
           : 'blooms'
         } found`
       : 'No blooms found ♡';
+
   }
 
 
-  searchResults.innerHTML='';
+  searchResults.innerHTML = '';
 
 
-  if(matches.length===0){
+  if(matches.length === 0){
 
-    searchResults.innerHTML=`
+    searchResults.innerHTML = `
       <div class="search-no-results">
 
-        <div class="search-no-icon">♡</div>
+        <div class="search-no-icon">
+          ♡
+        </div>
 
-        <h3>Nothing found</h3>
+        <h3>
+          Nothing found
+        </h3>
 
         <p>
           Try another flower, colour or gift.
@@ -678,23 +1080,27 @@ function performSearch(){
     `;
 
     return;
+
   }
 
 
-  matches.forEach(product=>{
+  matches.forEach(product => {
 
-    const result=
+    const result =
       document.createElement('article');
 
-    result.className=
+
+    result.className =
       'search-result-card';
 
-    result.innerHTML=`
+
+    result.innerHTML = `
 
       <img
         src="${product.image}"
         alt="${product.name}"
       >
+
 
       <div class="search-result-info">
 
@@ -704,21 +1110,30 @@ function performSearch(){
           : ''
         }
 
-        <h3>${product.name}</h3>
 
-        <p>${product.price}</p>
+        <h3>
+          ${product.name}
+        </h3>
+
+
+        <p>
+          ${product.price}
+        </p>
 
       </div>
+
 
       <button
         type="button"
         class="search-add-button"
-      >+</button>
+      >
+        +
+      </button>
 
     `;
 
 
-    const addButton=
+    const addButton =
       result.querySelector(
         '.search-add-button'
       );
@@ -728,49 +1143,64 @@ function performSearch(){
 
       addButton.addEventListener(
         'click',
-        event=>{
+        event => {
 
           event.stopPropagation();
 
           addToCart(product);
 
           closeSearch();
+
         }
       );
+
     }
 
 
     result.addEventListener(
       'click',
-      event=>{
+      event => {
 
         if(
           event.target.closest(
             '.search-add-button'
           )
-        )return;
+        )
+          return;
+
 
         closeSearch();
 
-        setTimeout(()=>{
 
-          const shop=
-            document.querySelector('#shop');
+        setTimeout(
+          () => {
 
-          if(shop){
+            const shop =
+              document.querySelector('#shop');
 
-            shop.scrollIntoView({
-              behavior:'smooth'
-            });
-          }
 
-        },100);
+            if(shop){
+
+              shop.scrollIntoView({
+                behavior:'smooth'
+              });
+
+            }
+
+          },
+          100
+        );
+
       }
     );
 
 
-    searchResults.appendChild(result);
+    searchResults.appendChild(
+      result
+    );
+
   });
+
 }
 
 
@@ -780,6 +1210,7 @@ if(searchButton){
     'click',
     openSearch
   );
+
 }
 
 
@@ -789,6 +1220,7 @@ if(searchClose){
     'click',
     closeSearch
   );
+
 }
 
 
@@ -799,15 +1231,17 @@ if(productSearch){
     performSearch
   );
 
+
   productSearch.addEventListener(
     'keydown',
-    event=>{
+    event => {
 
-      if(event.key==='Escape')
+      if(event.key === 'Escape')
         closeSearch();
 
     }
   );
+
 }
 
 
@@ -815,17 +1249,21 @@ if(searchClear){
 
   searchClear.addEventListener(
     'click',
-    ()=>{
+    () => {
 
       if(productSearch){
 
-        productSearch.value='';
+        productSearch.value = '';
+
         productSearch.focus();
+
       }
 
       performSearch();
+
     }
   );
+
 }
 
 
@@ -833,86 +1271,115 @@ if(searchOverlay){
 
   searchOverlay.addEventListener(
     'click',
-    event=>{
+    event => {
 
-      if(event.target===searchOverlay)
+      if(
+        event.target === searchOverlay
+      )
         closeSearch();
 
     }
   );
+
 }
 
 
 document.addEventListener(
   'keydown',
-  event=>{
+  event => {
 
     if(
-      event.key==='Escape' &&
+      event.key === 'Escape' &&
       searchOverlay &&
       searchOverlay.classList.contains('open')
     ){
+
       closeSearch();
+
     }
 
   }
 );
+
 
 /* =========================
    INSTAGRAM GRID
 ========================= */
 
 const instagramGrid =
-  document.querySelector('#instagram-grid');
+  document.querySelector(
+    '#instagram-grid'
+  );
+
 
 if(instagramGrid){
 
-  instagramGrid.innerHTML='';
-
-  instagramImages.forEach(image=>{
-
-    const link=
-      document.createElement('a');
-
-    link.href=
-      'https://instagram.com/thhepetalandco';
-
-    link.target='_blank';
-
-    link.rel='noopener noreferrer';
+  instagramGrid.innerHTML = '';
 
 
-    const img=
-      document.createElement('img');
+  instagramImages.forEach(
+    image => {
 
-    img.src=image;
-
-    img.alt=
-      'THEE PETAL AND CO Instagram';
+      const link =
+        document.createElement('a');
 
 
-    link.appendChild(img);
+      link.href =
+        'https://instagram.com/thhepetalandco';
 
-    instagramGrid.appendChild(link);
-  });
+
+      link.target =
+        '_blank';
+
+
+      link.rel =
+        'noopener noreferrer';
+
+
+      const img =
+        document.createElement('img');
+
+
+      img.src =
+        image;
+
+
+      img.alt =
+        'THEE PETAL AND CO Instagram';
+
+
+      link.appendChild(img);
+
+      instagramGrid.appendChild(link);
+
+    }
+  );
+
 }
-
 
 /* =========================
    MOBILE MENU
 ========================= */
 
-const drawer=
-  document.querySelector('#mobile-drawer');
+const drawer =
+  document.querySelector(
+    '#mobile-drawer'
+  );
 
-const backdrop=
-  document.querySelector('#drawer-backdrop');
+const backdrop =
+  document.querySelector(
+    '#drawer-backdrop'
+  );
 
-const menuOpen=
-  document.querySelector('#menu-open');
+const menuOpen =
+  document.querySelector(
+    '#menu-open'
+  );
 
-const menuClose=
-  document.querySelector('#menu-close');
+const menuClose =
+  document.querySelector(
+    '#menu-close'
+  );
 
 
 function toggleMenu(open){
@@ -924,11 +1391,14 @@ function toggleMenu(open){
       open
     );
 
+
     drawer.setAttribute(
       'aria-hidden',
       String(!open)
     );
+
   }
+
 
   if(backdrop){
 
@@ -936,12 +1406,15 @@ function toggleMenu(open){
       'open',
       open
     );
+
   }
+
 
   document.body.classList.toggle(
     'menu-open',
     open
   );
+
 }
 
 
@@ -949,8 +1422,9 @@ if(menuOpen){
 
   menuOpen.addEventListener(
     'click',
-    ()=>toggleMenu(true)
+    () => toggleMenu(true)
   );
+
 }
 
 
@@ -958,8 +1432,9 @@ if(menuClose){
 
   menuClose.addEventListener(
     'click',
-    ()=>toggleMenu(false)
+    () => toggleMenu(false)
   );
+
 }
 
 
@@ -967,24 +1442,29 @@ if(backdrop){
 
   backdrop.addEventListener(
     'click',
-    ()=>toggleMenu(false)
+    () => toggleMenu(false)
   );
+
 }
 
 
 if(drawer){
 
-  const links=
+  const links =
     drawer.querySelectorAll('a');
 
-  links.forEach(link=>{
 
-    link.addEventListener(
-      'click',
-      ()=>toggleMenu(false)
-    );
+  links.forEach(
+    link => {
 
-  });
+      link.addEventListener(
+        'click',
+        () => toggleMenu(false)
+      );
+
+    }
+  );
+
 }
 
 
@@ -992,23 +1472,35 @@ if(drawer){
    CUSTOM ORDER + PHOTO
 ========================= */
 
-const customForm=
-  document.querySelector('#custom-form');
+const customForm =
+  document.querySelector(
+    '#custom-form'
+  );
 
-const successMessage=
-  document.querySelector('#form-success');
+const successMessage =
+  document.querySelector(
+    '#form-success'
+  );
 
-const photoInput=
-  document.querySelector('#photo');
+const photoInput =
+  document.querySelector(
+    '#photo'
+  );
 
-const photoData=
-  document.querySelector('#photoData');
+const photoData =
+  document.querySelector(
+    '#photoData'
+  );
 
-const photoName=
-  document.querySelector('#photoName');
+const photoName =
+  document.querySelector(
+    '#photoName'
+  );
 
-const photoMimeType=
-  document.querySelector('#photoMimeType');
+const photoMimeType =
+  document.querySelector(
+    '#photoMimeType'
+  );
 
 
 if(customForm){
@@ -1019,7 +1511,8 @@ if(customForm){
 
       event.preventDefault();
 
-      const file=
+
+      const file =
         photoInput &&
         photoInput.files
           ? photoInput.files[0]
@@ -1032,138 +1525,175 @@ if(customForm){
 
         customForm.submit();
 
-        setTimeout(()=>{
 
-          if(successMessage)
-            successMessage.hidden=false;
+        setTimeout(
+          () => {
 
-          customForm.reset();
+            if(successMessage)
+              successMessage.hidden = false;
 
-        },1500);
+
+            customForm.reset();
+
+          },
+          1500
+        );
+
 
         return;
+
       }
 
 
       /* PHOTO */
 
-      const reader=
+      const reader =
         new FileReader();
 
 
-      reader.onload=function(){
+      reader.onload =
+        function(){
 
-        const img=
-          new Image();
-
-
-        img.onload=function(){
-
-          const canvas=
-            document.createElement('canvas');
-
-          const maxWidth=1200;
-          const maxHeight=1200;
-
-          let width=img.width;
-          let height=img.height;
+          const img =
+            new Image();
 
 
-          if(width>maxWidth){
+          img.onload =
+            function(){
 
-            height=
-              height*(maxWidth/width);
-
-            width=maxWidth;
-          }
-
-
-          if(height>maxHeight){
-
-            width=
-              width*(maxHeight/height);
-
-            height=maxHeight;
-          }
+              const canvas =
+                document.createElement(
+                  'canvas'
+                );
 
 
-          canvas.width=width;
-          canvas.height=height;
+              const maxWidth = 1200;
+              const maxHeight = 1200;
 
 
-          const ctx=
-            canvas.getContext('2d');
+              let width = img.width;
+              let height = img.height;
 
 
-          if(!ctx){
+              if(width > maxWidth){
 
-            customForm.submit();
-            return;
-          }
+                height =
+                  height *
+                  (maxWidth / width);
 
+                width =
+                  maxWidth;
 
-          ctx.drawImage(
-            img,
-            0,
-            0,
-            width,
-            height
-          );
+              }
 
 
-          const compressedData=
-            canvas.toDataURL(
-              'image/jpeg',
-              0.75
-            );
+              if(height > maxHeight){
+
+                width =
+                  width *
+                  (maxHeight / height);
+
+                height =
+                  maxHeight;
+
+              }
 
 
-          if(photoData){
+              canvas.width =
+                width;
 
-            photoData.value=
-              compressedData;
-          }
-
-
-          if(photoName){
-
-            photoName.value=
-              file.name.replace(
-                /\.[^/.]+$/,
-                ''
-              )+'.jpg';
-          }
+              canvas.height =
+                height;
 
 
-          if(photoMimeType){
-
-            photoMimeType.value=
-              'image/jpeg';
-          }
-
-
-          customForm.submit();
+              const ctx =
+                canvas.getContext(
+                  '2d'
+                );
 
 
-          setTimeout(()=>{
+              if(!ctx){
 
-            if(successMessage)
-              successMessage.hidden=false;
+                customForm.submit();
 
-            customForm.reset();
+                return;
 
-          },1500);
+              }
+
+
+              ctx.drawImage(
+                img,
+                0,
+                0,
+                width,
+                height
+              );
+
+
+              const compressedData =
+                canvas.toDataURL(
+                  'image/jpeg',
+                  0.75
+                );
+
+
+              if(photoData){
+
+                photoData.value =
+                  compressedData;
+
+              }
+
+
+              if(photoName){
+
+                photoName.value =
+                  file.name.replace(
+                    /\.[^/.]+$/,
+                    ''
+                  ) + '.jpg';
+
+              }
+
+
+              if(photoMimeType){
+
+                photoMimeType.value =
+                  'image/jpeg';
+
+              }
+
+
+              customForm.submit();
+
+
+              setTimeout(
+                () => {
+
+                  if(successMessage)
+                    successMessage.hidden = false;
+
+
+                  customForm.reset();
+
+                },
+                1500
+              );
+
+            };
+
+
+          img.src =
+            reader.result;
 
         };
 
 
-        img.src=reader.result;
-      };
-
-
       reader.readAsDataURL(file);
+
     }
   );
+
 }
 
 
