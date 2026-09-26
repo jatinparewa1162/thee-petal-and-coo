@@ -1,5 +1,5 @@
 /* =========================
-   THEE PETAL AND CO.
+   HarSheyy.flor
    SHOP PAGE
    PART 1/4
 ========================= */
