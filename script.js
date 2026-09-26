@@ -192,8 +192,6 @@ function addToCart(product){
       name: product.name,
       priceNumber: product.priceNumber,
       price: product.price,
-      category: product.category || "",
-      description: product.description || "",
       image: product.image,
       quantity: 1
     });
@@ -513,51 +511,6 @@ if(customiseOrder){
     "click",
     function(){
 
-      if(cart.length === 0){
-
-        closeCart();
-
-        alert(
-          "Please add something to your bag first ♡"
-        );
-
-        return;
-
-      }
-
-      const orderData = {
-
-        products: cart.map(function(item){
-          return {
-            id: item.id,
-            name: item.name,
-            category: item.category || "",
-            quantity: Number(item.quantity || 1),
-            price: Number(item.priceNumber || 0),
-            priceNumber: Number(item.priceNumber || 0)
-          };
-        }),
-
-        total: getCartTotal()
-
-      };
-
-      try{
-
-        sessionStorage.setItem(
-          "petalCartOrder",
-          JSON.stringify(orderData)
-        );
-
-      }catch(error){
-
-        console.error(
-          "Could not save order:",
-          error
-        );
-
-      }
-
       closeCart();
 
       const customSection =
@@ -570,11 +523,6 @@ if(customiseOrder){
         customSection.scrollIntoView({
           behavior: "smooth"
         });
-
-        setTimeout(
-          autoFillCustomOrder,
-          150
-        );
 
       }else{
 

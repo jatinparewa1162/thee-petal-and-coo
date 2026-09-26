@@ -12,72 +12,6 @@ let products = [];
 
 let selectedCategory = "All Blooms";
 
-const PRODUCTS_CACHE_KEY = "petalProductsCache_v1";
-
-function loadCachedProducts(){
-
-  try{
-
-    const cached =
-      localStorage.getItem(
-        PRODUCTS_CACHE_KEY
-      );
-
-    if(!cached) return false;
-
-    const parsed =
-      JSON.parse(cached);
-
-    if(
-      !parsed ||
-      !Array.isArray(parsed.products)
-    ){
-      return false;
-    }
-
-    products = parsed.products;
-
-    renderProducts();
-    applyUrlSearch();
-
-    return true;
-
-  }catch(error){
-
-    console.warn(
-      "Could not load cached products:",
-      error
-    );
-
-    return false;
-
-  }
-
-}
-
-function saveProductsCache(data){
-
-  try{
-
-    localStorage.setItem(
-      PRODUCTS_CACHE_KEY,
-      JSON.stringify({
-        timestamp: Date.now(),
-        products: data
-      })
-    );
-
-  }catch(error){
-
-    console.warn(
-      "Could not save products cache:",
-      error
-    );
-
-  }
-
-}
-
 
 /* =========================
    SHARED CART
@@ -239,8 +173,6 @@ function formatPrice(amount){
 
 async function loadProducts(){
 
-  loadCachedProducts();
-
   try{
 
     const response =
@@ -365,11 +297,6 @@ async function loadProducts(){
             product.priceNumber > 0 &&
             product.image
         );
-
-
-    saveProductsCache(
-      products
-    );
 
 
     renderProducts();
@@ -2216,6 +2143,8 @@ if(searchOverlay){
 /* =========================
    START
 ========================= */
+
+loadProducts();
 
 /* =========================
    FINAL SHOP PAGE SETUP
