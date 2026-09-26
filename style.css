@@ -1978,3 +1978,15 @@ footer{
 .site-policy p{margin:0 0 16px;font-size:14px;line-height:1.8;color:var(--muted)}
 .site-policy strong{color:var(--brown)}
 @media(max-width:700px){.policy-links{gap:14px;flex-wrap:wrap;padding-left:20px;padding-right:20px}.site-policy{padding:58px 28px 70px}.site-policy p{font-size:13px;line-height:1.75}}
+
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+
+button,
+a,
+input,
+select,
+textarea {
+  -webkit-tap-highlight-color: transparent;
+}
