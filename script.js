@@ -1,5 +1,5 @@
 /* =====================================================
-   THEE PETAL AND CO.
+   HarSheyy.flor
    FINAL SCRIPT — PART 1/4
 ===================================================== */
 
@@ -1055,7 +1055,7 @@ if(instagramRoot){
         document.createElement("a");
 
       link.href =
-        "https://instagram.com/thhepetalandco";
+        "https://instagram.com/harsheyy.flor";
 
       link.target = "_blank";
       link.rel = "noreferrer";
