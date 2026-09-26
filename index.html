@@ -1,0 +1,899 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1"
+  >
+
+  <meta
+    name="description"
+    content="Handmade bouquets and thoughtful gifts from THEE PETAL AND CO., made with love in Delhi."
+  >
+
+  <title>
+    THEE PETAL AND CO. — Handmade flowers, tied with love
+  </title>
+
+  <link rel="stylesheet" href="style.css">
+</head>
+
+
+<body>
+
+
+  <div class="announcement">
+    HANDMADE WITH LOVE IN DELHI
+    <span>♡</span>
+    CUSTOM ORDERS OPEN
+  </div>
+
+
+  <header class="site-header">
+
+    <div class="nav-wrap">
+
+      <button
+        class="icon-button mobile-only"
+        id="menu-open"
+        aria-label="Open menu"
+      >
+        ☰
+      </button>
+
+
+      <nav class="desktop-nav">
+
+        <a href="shop.html">
+          Shop
+        </a>
+
+        <a href="#story">
+          Our story
+        </a>
+
+        <a href="#custom">
+          Custom orders
+        </a>
+
+      </nav>
+
+
+      <a class="brand" href="#top">
+        PETAL <span>&amp;</span> CO.
+      </a>
+
+
+      <div class="actions">
+
+        <button
+          class="icon-button search-button"
+          aria-label="Search"
+          type="button"
+        >
+          ⌕
+        </button>
+
+        <button
+          class="icon-button"
+          id="bag-button"
+          aria-label="Shopping bag"
+          type="button"
+        >
+          ♧
+        </button>
+
+        <span
+          class="cart-count"
+          id="cart-count"
+          hidden
+        >
+          0
+        </span>
+
+      </div>
+
+    </div>
+
+  </header>
+
+
+  <!-- SEARCH OVERLAY -->
+
+  <div
+    class="search-overlay"
+    id="search-overlay"
+    aria-hidden="true"
+  >
+
+    <div class="search-overlay-inner">
+
+      <div class="search-top">
+
+        <p class="eyebrow">
+          find your little something
+        </p>
+
+        <button
+          type="button"
+          class="search-close"
+          id="search-close"
+          aria-label="Close search"
+        >
+          ×
+        </button>
+
+      </div>
+
+
+      <div class="search-box">
+
+        <span class="search-symbol">
+          ⌕
+        </span>
+
+        <input
+          type="search"
+          id="product-search"
+          placeholder="Search bouquets, gifts..."
+          autocomplete="off"
+        >
+
+        <button
+          type="button"
+          id="search-clear"
+          aria-label="Clear search"
+          hidden
+        >
+          ×
+        </button>
+
+      </div>
+
+
+      <div
+        class="search-hint"
+        id="search-hint"
+      >
+        Try “pink”, “bouquet” or “gift”
+      </div>
+
+
+      <div
+        class="search-results"
+        id="search-results"
+      ></div>
+
+    </div>
+
+  </div>
+
+
+  <!-- MOBILE MENU -->
+
+  <aside
+    class="mobile-drawer"
+    id="mobile-drawer"
+    aria-hidden="true"
+  >
+
+    <button
+      class="drawer-close"
+      id="menu-close"
+      aria-label="Close menu"
+    >
+      ×
+    </button>
+
+    <nav>
+
+      <a href="shop.html">
+        Shop
+      </a>
+
+      <a href="#story">
+        Our story
+      </a>
+
+      <a href="#custom">
+        Custom orders
+      </a>
+
+    </nav>
+
+  </aside>
+
+
+  <div
+    class="drawer-backdrop"
+    id="drawer-backdrop"
+  ></div>
+
+
+  <!-- CART DRAWER -->
+
+  <div
+    class="cart-backdrop"
+    id="cart-backdrop"
+  ></div>
+
+
+  <aside
+    class="cart-drawer"
+    id="cart-drawer"
+  >
+
+    <div class="cart-header">
+
+      <h2>
+        Your Bag
+      </h2>
+
+      <button
+        type="button"
+        class="cart-close"
+        id="cart-close"
+        aria-label="Close bag"
+      >
+        ×
+      </button>
+
+    </div>
+
+
+    <div
+      class="cart-items"
+      id="cart-items"
+    >
+
+      <div
+        class="cart-empty"
+        id="cart-empty"
+      >
+
+        <p>
+          Your bag is empty ♡
+        </p>
+
+        <a
+          href="shop.html"
+          class="button outline"
+        >
+          Continue shopping
+        </a>
+
+      </div>
+
+    </div>
+
+
+    <div class="cart-footer">
+
+      <div class="cart-total-row">
+
+        <span>
+          Total
+        </span>
+
+        <strong id="cart-total">
+          ₹0
+        </strong>
+
+      </div>
+
+
+      <button
+        type="button"
+        class="button primary full customise-order"
+        id="customise-order"
+      >
+        Customise / Order
+        <span>→</span>
+      </button>
+
+    </div>
+
+  </aside>
+
+
+  <main id="top">
+
+
+    <!-- HERO -->
+
+    <section class="hero page-width">
+
+      <div class="hero-copy">
+
+        <p class="eyebrow">
+          handmade flowers · thoughtful gifting
+        </p>
+
+        <h1>
+          Petals, tied
+          <br>
+          <em>with a little love</em> ♡
+        </h1>
+
+        <p class="lead">
+          Handmade bouquets and sweet little gifts,
+          created to make your special moments feel
+          even more beautiful.
+        </p>
+
+        <div class="button-row">
+
+          <a
+            class="button primary"
+            href="shop.html"
+          >
+            Shop our bouquets
+            <span>→</span>
+          </a>
+
+          <a
+            class="button outline"
+            href="#custom"
+          >
+            Custom order
+          </a>
+
+        </div>
+
+      </div>
+
+
+      <div class="hero-art">
+
+        <div class="orb"></div>
+
+        <div class="logo-frame">
+
+          <img
+            src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/799934652_18100947485058674_1029647408730804085_n-KwMiQW55khA2cXm9RGORSX95VHV2y5.jpg"
+            alt="Petal & Co logo over colorful flowers"
+          >
+
+        </div>
+
+        <p>
+          made for your love notes ✿
+        </p>
+
+      </div>
+
+    </section>
+
+
+    <!-- SHOP PREVIEW -->
+
+    <section
+      class="shop-section"
+      id="shop"
+    >
+
+      <div class="page-width">
+
+        <div class="section-heading">
+
+          <div>
+
+            <p class="eyebrow">
+              a little joy, wrapped up
+            </p>
+
+            <h2>
+              Made to make them smile.
+            </h2>
+
+          </div>
+
+
+          <a href="shop.html">
+            View all blooms
+          </a>
+
+        </div>
+
+
+        <div
+          class="products"
+          id="products"
+        ></div>
+
+      </div>
+
+    </section>
+
+
+    <!-- STORY -->
+
+    <section
+      class="story page-width"
+      id="story"
+    >
+
+      <div class="story-image">
+
+        <img
+          src="https://images.unsplash.com/photo-1526047932273-341f2a7631f9?auto=format&fit=crop&w=900&q=85"
+          alt="Colorful handmade flowers"
+        >
+
+        <span>
+          Delhi, with love ♡
+        </span>
+
+      </div>
+
+
+      <div class="story-copy">
+
+        <p class="eyebrow">
+          our little flower corner
+        </p>
+
+        <h2>
+          For the moments
+          <br>
+          <em>worth holding on to.</em>
+        </h2>
+
+        <p class="lead">
+          We make flowers that feel like a handwritten
+          note — playful, personal and made slowly by
+          hand. From birthday surprises to just-because
+          gifting, every Petal &amp; Co piece is made in
+          our Delhi studio with a little extra love.
+        </p>
+
+        <p class="signature">
+          No two bouquets are ever quite the same.
+        </p>
+
+      </div>
+
+    </section>
+
+
+    <!-- CUSTOM ORDER -->
+
+    <section
+      class="custom-section"
+      id="custom"
+    >
+
+      <div class="custom-grid page-width">
+
+
+        <div class="custom-copy">
+
+          <p class="eyebrow">
+            made just for you
+          </p>
+
+          <h2>
+            Dream it.
+            <br>
+            <em>We'll make it.</em>
+          </h2>
+
+          <p>
+            Have a color palette, a flower, a photo
+            or a feeling in mind? Tell us about it and
+            we'll turn it into something lovely.
+          </p>
+
+          <p class="signature">
+            Custom orders, made in Delhi ♡
+          </p>
+
+        </div>
+
+
+        <form
+          class="custom-form"
+          id="custom-form"
+          action="https://script.google.com/macros/s/AKfycbwiGE4hTomAmuLKBkcWrBIxkSrXA91c80O09oahNABFZpQYgQApSgpXk7b2-28GDaDP/exec"
+          method="POST"
+          target="hidden-form"
+        >
+
+
+          <label>
+
+            Name
+
+            <input
+              required
+              name="name"
+              placeholder="Your name"
+            >
+
+          </label>
+
+
+          <label>
+
+            WhatsApp number
+
+            <input
+              required
+              name="whatsapp"
+              placeholder="+91 ..."
+            >
+
+          </label>
+
+
+          <label>
+
+            Occasion
+
+            <select name="occasion">
+
+              <option>Birthday</option>
+              <option>Anniversary</option>
+              <option>Just because</option>
+              <option>Other</option>
+
+            </select>
+
+          </label>
+
+
+          <label>
+
+            Budget
+
+            <select
+              name="budget"
+              id="budget"
+            >
+
+              <option value="₹500 – ₹1,000">
+                ₹500 – ₹1,000
+              </option>
+
+              <option value="₹1,000 – ₹2,000">
+                ₹1,000 – ₹2,000
+              </option>
+
+              <option value="₹2,000+">
+                ₹2,000+
+              </option>
+
+            </select>
+
+          </label>
+
+
+          <label>
+
+            Preferred colours
+
+            <input
+              name="colours"
+              placeholder="Pink, red, a little yellow..."
+            >
+
+          </label>
+
+
+          <label>
+
+            Product type
+
+            <select
+              name="product"
+              id="product"
+            >
+
+              <option value="Bouquets">
+                Bouquets
+              </option>
+
+              <option value="Handmade Flowers">
+                Handmade Flowers
+              </option>
+
+              <option value="Gift Hampers">
+                Gift Hampers
+              </option>
+
+              <option value="Birthday Gifts">
+                Birthday Gifts
+              </option>
+
+              <option value="Anniversary Gifts">
+                Anniversary Gifts
+              </option>
+
+              <option value="Just Because">
+                Just Because
+              </option>
+
+              <option value="Custom Gifts">
+                Custom Gifts
+              </option>
+
+            </select>
+
+          </label>
+
+
+          <label class="full">
+
+            Custom message
+
+            <textarea
+              name="message"
+              id="message"
+              rows="3"
+              placeholder="Tell us your idea..."
+            ></textarea>
+
+          </label>
+
+
+          <label class="full file-label">
+
+            Upload inspiration/photo
+
+            <input
+              type="file"
+              id="photo"
+              name="photo"
+              accept="image/*"
+            >
+
+            <input
+              type="hidden"
+              id="photoData"
+              name="photoData"
+            >
+
+            <input
+              type="hidden"
+              id="photoName"
+              name="photoName"
+            >
+
+            <input
+              type="hidden"
+              id="photoMimeType"
+              name="photoMimeType"
+            >
+
+          </label>
+
+
+          <button
+            class="button primary full"
+            type="submit"
+          >
+            Request custom order
+            <span>→</span>
+          </button>
+
+
+          <p
+            class="form-success full"
+            id="form-success"
+            hidden
+          >
+            Thank you — your request has been received ♡
+          </p>
+
+
+        </form>
+
+      </div>
+
+    </section>
+
+
+    <!-- HIDDEN SUBMISSION FRAME -->
+
+    <iframe
+      name="hidden-form"
+      style="display:none;"
+    ></iframe>
+
+
+    <!-- REVIEWS -->
+
+    <section class="reviews page-width">
+
+      <div class="section-heading">
+
+        <div>
+
+          <p class="eyebrow">
+            notes from our love club
+          </p>
+
+          <h2>
+            What our customers say ♡
+          </h2>
+
+        </div>
+
+        <a
+          href="https://instagram.com/thhepetalandco"
+          target="_blank"
+          rel="noreferrer"
+        >
+          View Instagram reviews
+        </a>
+
+      </div>
+
+
+      <div class="review-grid">
+
+
+        <article>
+
+          <div class="stars">
+            ★★★★★
+          </div>
+
+          <p>
+            “The prettiest surprise — it felt so
+            personal and the packaging was adorable!”
+          </p>
+
+          <small>
+            Riya S. · The Pink Promise
+          </small>
+
+        </article>
+
+
+        <article>
+
+          <div class="stars">
+            ★★★★★
+          </div>
+
+          <p>
+            “I sent a vague idea and they made it
+            even better. Every tiny detail was perfect.”
+          </p>
+
+          <small>
+            Mehak A. · Custom bouquet
+          </small>
+
+        </article>
+
+
+        <article>
+
+          <div class="stars">
+            ★★★★★
+          </div>
+
+          <p>
+            “My best friend is still talking about
+            this bouquet. So colourful, so us.”
+          </p>
+
+          <small>
+            Ananya K. · Strawberry Fields
+          </small>
+
+        </article>
+
+
+      </div>
+
+    </section>
+
+
+    <!-- INSTAGRAM -->
+
+    <section class="instagram">
+
+      <div class="page-width center">
+
+        <p class="eyebrow">
+          @thhepetalandco
+        </p>
+
+        <h2>
+          Made With Love, Shared With You ♡
+        </h2>
+
+        <div
+          class="instagram-grid"
+          id="instagram-grid"
+        ></div>
+
+        <a
+          class="button primary"
+          href="https://instagram.com/thhepetalandco"
+          target="_blank"
+          rel="noreferrer"
+        >
+          Follow us on Instagram
+          <span>→</span>
+        </a>
+
+      </div>
+
+    </section>
+
+
+  </main>
+
+
+  <!-- FOOTER -->
+
+  <footer>
+
+    <div class="footer-inner page-width">
+
+      <div>
+
+        <p class="footer-brand">
+          PETAL <span>&amp;</span> CO.
+        </p>
+
+        <p>
+          Handmade flowers, thoughtful gifts.
+          <br>
+          Made with love in Delhi ♡
+        </p>
+
+      </div>
+
+
+      <div class="footer-links">
+
+        <a href="shop.html">
+          Shop
+        </a>
+
+        <a href="#story">
+          Our story
+        </a>
+
+        <a
+          href="https://instagram.com/thhepetalandco"
+          target="_blank"
+          rel="noreferrer"
+        >
+          Instagram
+        </a>
+
+      </div>
+
+    </div>
+
+
+    <div class="copyright page-width">
+
+      © 2026 THEE PETAL AND CO ·
+      Custom orders via WhatsApp
+
+    </div>
+
+    <div class="policy-links page-width">
+      <a href="terms.html">Terms &amp; Conditions</a>
+      <a href="refund.html">Return &amp; Refund Policy</a>
+    </div>
+
+  </footer>
+
+
+  <script src="script.js"></script>
+
+
+</body>
+
+</html>
